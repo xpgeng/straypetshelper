@@ -14,6 +14,8 @@ from flask import Flask, request, render_template, url_for, send_from_directory
 from time import strftime, localtime
 from werkzeug import secure_filename
 from sae.storage import Connection, Bucket
+from sae.ext.storage import monkey
+monkey.patch_all()
 
 #####################constant variable#######################
 ROOT = os.path.dirname(os.path.abspath(__file__))
