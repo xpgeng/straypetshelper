@@ -3,7 +3,7 @@ from fabric.api import env, run, local, settings
 from datetime import datetime
 
 
-def gitbranch(m='Commit something to dev...'):
+def gitbranch(m='Commit something to branch...'):
 	'''gitdev:m = "COMMIT LOGGING"\t(default as 'Commit something to dev...')
 	'''	
 	local('pwd'		    
@@ -14,8 +14,9 @@ def gitbranch(m='Commit something to dev...'):
         )
 
 
-def gitmaster(f='src && README.md', m='Commit something to dev...'):
-	'''gitdev:f = "ADD FILENAMES"\t(default as 'src && README.md'), m = "COMMIT LOGGING"\t(default as 'Commit something to dev...')
+def gitmaster(f='src && README.md', m='Commit something to master...'):
+	'''gitdev:f = "ADD FILENAMES"\t(default as 'src && README.md'), 
+	          m = "COMMIT LOGGING"\t(default as 'Commit something to master...')
 	'''	
 	local('pwd'		    
 		    '&& git add {filename}'
