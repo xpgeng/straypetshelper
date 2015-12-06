@@ -17,7 +17,7 @@ from sae.storage import Connection, Bucket
 from sae.ext.storage import monkey
 monkey.patch_all()
 
-#####################constant variable#######################
+#####################constant variables#######################
 ROOT = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = ROOT+'/uploads'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
@@ -32,6 +32,7 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  #the max value of file size
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+
 
 def check_filename(filename):
     """
@@ -55,9 +56,33 @@ def save_image(filename, file):
     print bucket.generate_url(filename) 
     return bucket.generate_url(filename)
 
+
+def count_items():
+    if kv.get('NumberOfItems'):
+        item_number = kv.get('NumberOfItems') + 1
+        kv.replace('NumberOfItems', item_number)
+        return item_number
+    else:
+        kv.set('NumberOfItems', 1)
+        return 1
+
+
+def save_data(pet_title,species,location,tel,supplement, photo_url):
+    """
+    """
+    time = strftime("%y\%m\%d-%H:%M:%S", localtime())
+    kv = sae.kvdb.Client()
+    item_number = count_items()
+    key = strftime("%y%m%d%H%M%S" , localtime())
+    value = {'pet_title':pet_title, 'species': species,'location'=location, 
+        'tel'=tel, 'supplement'=supplement, 'photo_url'=photo_url,'time':time}
+    kv.set(key, value)
+    kv.disconnect_all()
+
 @app.route('/')
 def submit_pet():
     return render_template("index.html")
+
 
 @app.route('/', methods=['POST'])
 def check_pet():
@@ -70,11 +95,9 @@ def check_pet():
 
     if pet_photo and allowed_file(pet_photo.filename):
         filename = secure_filename(pet_photo.filename)
-        # 这里出现了bug, 中文名字的图片,会省去中文名, 只剩extension.所以用以下函数
         renew_filename = check_filename(filename)
         pet_photo.save(os.path.join(app.config['UPLOAD_FOLDER'], renew_filename))
-        save_image(renew_filename, pet_photo)
-
+        photo_url = save_image(renew_filename, pet_photo)
     return render_template("check.html", pet_title=pet_title,
             species=species, location=location, tel=tel, supplement=supplement)
 
