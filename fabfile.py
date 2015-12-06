@@ -4,7 +4,7 @@ from datetime import datetime
 
 
 def gitbranch(m='Commit something to branch...'):
-	'''gitdev:m = "COMMIT LOGGING"\t(default as 'Commit something to dev...')
+	'''gitbranch:m = "COMMIT LOGGING"\t(default as 'Commit something to dev...')
 	'''	
 	local('pwd'		    
 		    '&& git add src'
@@ -15,7 +15,7 @@ def gitbranch(m='Commit something to branch...'):
 
 
 def gitmaster(f='src && README.md', m='Commit something to master...'):
-	'''gitdev:f = "ADD FILENAMES"\t(default as 'src && README.md'), 
+	'''gitmaster:f = "ADD FILENAMES"\t(default as 'src && README.md'), 
 	          m = "COMMIT LOGGING"\t(default as 'Commit something to master...')
 	'''	
 	local('pwd'		    
