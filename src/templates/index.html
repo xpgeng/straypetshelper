@@ -18,7 +18,7 @@
 
 <div class="container">
 <div class="row">
-<form class="form-horizontal" role="form" action="/" method="post">
+<form class="form-horizontal" role="form" action="/" method="post" enctype="multipart/form-data">
 
 <div class="form-group">
 	<label for="pet-title" class="col-sm-2 control-label">标题</label>
@@ -31,7 +31,7 @@
 	<label for="petphoto" class="col-sm-2 control-label">上传照片</label>
 	<div class="col-sm-9">
 		<input type="file" id="petphoto" name="petphoto">
-		<p class="help-block">选择您要上传的小动物照片</p>
+		<p class="help-block">选择您要上传的小动物照片，支持照片格式: png, jpg, jpeg, gif</p>
 	</div>
 </div>
 
