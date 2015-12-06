@@ -27,7 +27,7 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  #the max value of file size
 
 
 
@@ -35,6 +35,10 @@ def allowed_file(filename):
 	return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 def check_filename(filename):
+	"""
+	    This funcion can solve the bug of omitting the Chinese characters in filename.
+
+	"""
     if filename in ALLOWED_EXTENSIONS:
         filename_new = "%s.%s" % (int(time.time()), filename)
         return filename_new
@@ -43,6 +47,9 @@ def check_filename(filename):
 
 
 def save_image(filename, file):
+	""" 
+	     output: the url of the image in the storage
+	"""
     c = Connection()
     bucket = c.get_bucket('imges')
     bucket.put_object(filename, file.read())
