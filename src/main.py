@@ -14,11 +14,8 @@ from flask import Flask, request, render_template, url_for, send_from_directory
 from time import strftime, localtime
 from werkzeug import secure_filename
 from sae.storage import Connection, Bucket
-from sae.ext.storage import monkey
 
-monkey.patch_all()
-
-#####################constant variable######################
+#####################constant variable#######################
 ROOT = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = ROOT+'/uploads'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
@@ -32,13 +29,13 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  #the max value of file size
 
 
 def allowed_file(filename):
-	return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+    return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 def check_filename(filename):
-	"""
-	    This funcion can solve the bug of omitting the Chinese characters in filename.
+    """
+        This funcion can solve the bug of omitting the Chinese characters in filename.
 
-	"""
+    """
     if filename in ALLOWED_EXTENSIONS:
         filename_new = "%s.%s" % (int(time.time()), filename)
         return filename_new
@@ -47,9 +44,9 @@ def check_filename(filename):
 
 
 def save_image(filename, file):
-	""" 
-	     output: the url of the image in the storage
-	"""
+    """ 
+         return: the url of the image in the storage
+    """
     c = Connection()
     bucket = c.get_bucket('imges')
     bucket.put_object(filename, file.read())
@@ -71,8 +68,8 @@ def check_pet():
 
     if pet_photo and allowed_file(pet_photo.filename):
         filename = secure_filename(pet_photo.filename)
+        # 这里出现了bug, 中文名字的图片,会省去中文名, 只剩extension.所以用以下函数
         renew_filename = check_filename(filename)
-        print renew_filename
         pet_photo.save(os.path.join(app.config['UPLOAD_FOLDER'], renew_filename))
         save_image(renew_filename, pet_photo)
 
