@@ -58,24 +58,27 @@ def save_image(filename, file):
 
 
 def count_items():
+    kv = sae.kvdb.Client()
     if kv.get('NumberOfItems'):
-        item_number = kv.get('NumberOfItems') + 1
-        kv.replace('NumberOfItems', item_number)
-        return item_number
+        number = kv.get('NumberOfItems') + 1
+        kv.replace('NumberOfItems', number)
+        return number
     else:
         kv.set('NumberOfItems', 1)
         return 1
+    kv.disconnect_all()
 
 
 def save_data(pet_title,species,location,tel,supplement, photo_url):
     """
     """
-    time = strftime("%y\%m\%d-%H:%M:%S", localtime())
-    kv = sae.kvdb.Client()
     item_number = count_items()
+    print item_number
+    kv = sae.kvdb.Client()
     key = strftime("%y%m%d%H%M%S" , localtime())
-    value = {'pet_title':pet_title, 'species': species,'location'=location, 
-        'tel'=tel, 'supplement'=supplement, 'photo_url'=photo_url,'time':time}
+    print key 
+    value = {'pet_title':pet_title, 'species': species,'location':location, 
+        'tel':tel, 'supplement':supplement, 'photo_url':photo_url,'time':time}
     kv.set(key, value)
     kv.disconnect_all()
 
@@ -92,15 +95,15 @@ def check_pet():
     tel = request.form['tel']
     supplement = request.form['supplement']
     pet_photo = request.files['petphoto']
-
     if pet_photo and allowed_file(pet_photo.filename):
         filename = secure_filename(pet_photo.filename)
         renew_filename = check_filename(filename)
         pet_photo.save(os.path.join(app.config['UPLOAD_FOLDER'], renew_filename))
         photo_url = save_image(renew_filename, pet_photo)
+    save_data(pet_title,species,location,tel,supplement, photo_url)
     return render_template("check.html", pet_title=pet_title,
             species=species, location=location, tel=tel, supplement=supplement)
 
 
 if  __name__ == "__main__":
-	app.run(debug=True)
+    app.run(debug=True)
