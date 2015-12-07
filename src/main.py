@@ -46,18 +46,20 @@ def check_filename(filename):
         return filename
 
 
-def save_image(filename, file):
+def save_image_return_url(filename, file):
     """ 
          return: the url of the image in the storage
     """
     c = Connection()
     bucket = c.get_bucket('imges')
     bucket.put_object(filename, file.read())
-    print bucket.generate_url(filename) 
     return bucket.generate_url(filename)
 
 
 def count_items():
+    """
+        count the number of  the items
+    """
     kv = sae.kvdb.Client()
     if kv.get('NumberOfItems'):
         number = kv.get('NumberOfItems') + 1
@@ -71,6 +73,8 @@ def count_items():
 
 def save_data(pet_title,species,location,tel,supplement, photo_url):
     """
+        key is like this form: 151204112340 which is convenient
+        to search according to datetime.
     """
     item_number = count_items()
     print item_number
@@ -99,7 +103,7 @@ def check_pet():
         filename = secure_filename(pet_photo.filename)
         renew_filename = check_filename(filename)
         pet_photo.save(os.path.join(app.config['UPLOAD_FOLDER'], renew_filename))
-        photo_url = save_image(renew_filename, pet_photo)
+        photo_url = save_image_return_url(renew_filename, pet_photo)
     save_data(pet_title,species,location,tel,supplement, photo_url)
     return render_template("check.html", pet_title=pet_title,
             species=species, location=location, tel=tel, supplement=supplement)
