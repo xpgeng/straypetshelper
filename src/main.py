@@ -17,7 +17,7 @@ from sae.storage import Connection, Bucket
 from sae.ext.storage import monkey
 monkey.patch_all()
 
-#####################constant variable#######################
+#####################constant variables#######################
 ROOT = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = ROOT+'/uploads'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
@@ -33,6 +33,7 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  #the max value of file size
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
+
 def check_filename(filename):
     """
         This funcion can solve the bug of omitting the Chinese characters in filename.
@@ -45,19 +46,50 @@ def check_filename(filename):
         return filename
 
 
-def save_image(filename, file):
+def save_image_return_url(filename, file):
     """ 
          return: the url of the image in the storage
     """
     c = Connection()
     bucket = c.get_bucket('imges')
     bucket.put_object(filename, file.read())
-    print bucket.generate_url(filename) 
     return bucket.generate_url(filename)
+
+
+def count_items():
+    """
+        count the number of  the items
+    """
+    kv = sae.kvdb.Client()
+    if kv.get('NumberOfItems'):
+        number = kv.get('NumberOfItems') + 1
+        kv.replace('NumberOfItems', number)
+        return number
+    else:
+        kv.set('NumberOfItems', 1)
+        return 1
+    kv.disconnect_all()
+
+
+def save_data(pet_title,species,location,tel,supplement, photo_url):
+    """
+        key is like this form: 151204112340 which is convenient
+        to search according to datetime.
+    """
+    item_number = count_items()
+    print item_number
+    kv = sae.kvdb.Client()
+    key = strftime("%y%m%d%H%M%S" , localtime())
+    print key 
+    value = {'pet_title':pet_title, 'species': species,'location':location, 
+        'tel':tel, 'supplement':supplement, 'photo_url':photo_url,'time':time}
+    kv.set(key, value)
+    kv.disconnect_all()
 
 @app.route('/')
 def submit_pet():
     return render_template("index.html")
+
 
 @app.route('/', methods=['POST'])
 def check_pet():
@@ -67,17 +99,15 @@ def check_pet():
     tel = request.form['tel']
     supplement = request.form['supplement']
     pet_photo = request.files['petphoto']
-
     if pet_photo and allowed_file(pet_photo.filename):
         filename = secure_filename(pet_photo.filename)
-        # 这里出现了bug, 中文名字的图片,会省去中文名, 只剩extension.所以用以下函数
         renew_filename = check_filename(filename)
         pet_photo.save(os.path.join(app.config['UPLOAD_FOLDER'], renew_filename))
-        save_image(renew_filename, pet_photo)
-
+        photo_url = save_image_return_url(renew_filename, pet_photo)
+    save_data(pet_title,species,location,tel,supplement, photo_url)
     return render_template("check.html", pet_title=pet_title,
             species=species, location=location, tel=tel, supplement=supplement)
 
 
 if  __name__ == "__main__":
-	app.run(debug=True)
+    app.run(debug=True)
