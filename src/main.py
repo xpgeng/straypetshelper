@@ -10,7 +10,7 @@ sys.setdefaultencoding('utf-8')
 import os
 import sae.kvdb
 import time
-from flask import Flask, request, render_template, url_for, send_from_directory
+from flask import Flask, request, render_template, url_for, send_from_directory, flash
 from time import strftime, localtime
 from werkzeug import secure_filename
 from sae.storage import Connection, Bucket
@@ -18,14 +18,15 @@ from sae.ext.storage import monkey
 monkey.patch_all()
 
 #####################constant variables#######################
-ROOT = os.path.dirname(os.path.abspath(__file__))
-UPLOAD_FOLDER = ROOT+'/uploads'
+#ROOT = os.path.dirname(os.path.abspath(__file__))
+#UPLOAD_FOLDER = ROOT+'/uploads'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
 
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.secret_key = 'some_secret'
+#app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  #the max value of file size
 
 
@@ -58,7 +59,7 @@ def save_image_return_url(filename, file):
 
 def count_items():
     """
-        count the number of  the items
+        count the number of  the items or pets
     """
     kv = sae.kvdb.Client()
     if kv.get('NumberOfItems'):
@@ -80,15 +81,26 @@ def save_data(pet_title,species,location,tel,supplement, photo_url):
     print item_number
     kv = sae.kvdb.Client()
     key = strftime("%y%m%d%H%M%S" , localtime())
-    print key 
+    print key
+    now = time.time()
     value = {'pet_title':pet_title, 'species': species,'location':location, 
-        'tel':tel, 'supplement':supplement, 'photo_url':photo_url,'time':time}
+        'tel':tel, 'supplement':supplement, 'photo_url':photo_url,'time':now}
     kv.set(key, value)
+    check_location(location)
     kv.disconnect_all()
 
 @app.route('/')
 def submit_pet():
     return render_template("index.html")
+
+@app.route('/signin', methods=['GET', 'POST'])
+def sign_up():
+    return render_template("signup.html")
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    return render_template('login.html')
+
 
 
 @app.route('/', methods=['POST'])
@@ -102,11 +114,23 @@ def check_pet():
     if pet_photo and allowed_file(pet_photo.filename):
         filename = secure_filename(pet_photo.filename)
         renew_filename = check_filename(filename)
-        pet_photo.save(os.path.join(app.config['UPLOAD_FOLDER'], renew_filename))
+        #pet_photo.save(os.path.join(app.config['UPLOAD_FOLDER'], renew_filename))
         photo_url = save_image_return_url(renew_filename, pet_photo)
     save_data(pet_title,species,location,tel,supplement, photo_url)
     return render_template("check.html", pet_title=pet_title,
             species=species, location=location, tel=tel, supplement=supplement)
+    
+
+#@app.route('/edit', methods=["POST"])
+#def edit():
+#    content = request.form["editContent"]
+##    tags = tags_process(request.form["editTags"])
+#    data_store(content, tags)
+#    flash("数据提交成功")
+#    return redirect( url_for('index') )
+
+
+#@app.route('/', methods=['POST'])
 
 
 if  __name__ == "__main__":
