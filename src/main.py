@@ -57,17 +57,31 @@ def save_image_return_url(filename, file):
     return bucket.generate_url(filename)
 
 
-def count_items():
+def pets_number():
     """
-        count the number of  the items or pets
+        count the number of  the pets
     """
     kv = sae.kvdb.Client()
-    if kv.get('NumberOfItems'):
-        number = kv.get('NumberOfItems') + 1
-        kv.replace('NumberOfItems', number)
+    if kv.get('petsnumber'):
+        number = kv.get('petsnumber') + 1
+        kv.replace('petsnumber', number)
         return number
     else:
-        kv.set('NumberOfItems', 1)
+        kv.set('petsnumber', 1)
+        return 1
+    kv.disconnect_all()
+
+def users_number():
+    """
+        count the number of  the pets
+    """
+    kv = sae.kvdb.Client()
+    if kv.get('usersnumber'):
+        number = kv.get('usersnumber') + 1
+        kv.replace('usersnumber', number)
+        return number
+    else:
+        kv.set('usersnumber', 1)
         return 1
     kv.disconnect_all()
 
@@ -77,7 +91,7 @@ def save_data(pet_title,species,location,tel,supplement, photo_url):
         key is like this form: 151204112340 which is convenient
         to search according to datetime.
     """
-    item_number = count_items()
+    item_number = pets_number()
     print item_number
     kv = sae.kvdb.Client()
     key = strftime("%y%m%d%H%M%S" , localtime())
@@ -86,20 +100,67 @@ def save_data(pet_title,species,location,tel,supplement, photo_url):
     value = {'pet_title':pet_title, 'species': species,'location':location, 
         'tel':tel, 'supplement':supplement, 'photo_url':photo_url,'time':now}
     kv.set(key, value)
-    check_location(location)
     kv.disconnect_all()
+
+def save_user(username, password, email):
+    usersnumber = users_number()
+    kv = sae.kvdb.Client()
+    user = str('u'+username) #防止用户输入数字与pet data的key 相撞, 同时能根据'u'快速搜索username
+    now = time.time()
+    message = {'username':username, 'password':password, 'email':email, 'time':now}
+    kv.set(user, message)
+    kv.disconnect_all()
+
+
+def check_login(username,password):
+    """
+    """
+    kv = sae.kvdb.Client()
+    key = str('u'+username)
+    print key
+    if password == kv.get(key)['password']:
+        return True
+        print 12580
+    else:
+        return False
+
+
 
 @app.route('/')
 def submit_pet():
     return render_template("index.html")
 
-@app.route('/signin', methods=['GET', 'POST'])
+@app.route('/signup', methods=['GET','POST'])
 def sign_up():
-    return render_template("signup.html")
+    message = None
+    print request.method
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        email = request.form['email']
+        confirmpassword = request.form['confirmpassword']
+        print username, password, email, confirmpassword
+        if password == confirmpassword:
+            save_user(username, password, email)
+            message = '注册成功!'
+        else:
+            message = '对不起,系统维护ing...'
+    return render_template("signup.html", message = message)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    return render_template('login.html')
+    message = None
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        print username, password
+        if not check_login(username,password):
+            message = '用户名或密码不正确'
+        else:
+            #flash('登陆成功')
+            #return redirect(url_for('submit_pet'))
+            message = '登录成功!'
+    return render_template('login.html', message = message)
 
 
 
