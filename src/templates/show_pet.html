@@ -46,19 +46,17 @@
 
 <div class="container">
 
-{% for image in images %}
-<!-- <img src="{{image}}" alt="your image" class="img-responsive img-thumbnail"> -->
+{% for i in range(num) %}
 
   <div class="col-sm-4 col-md-3">
     <div class="thumbnail">
-      <a href="">
-      <img src="{{image}}" alt="your image">
+      <a href="{{pet_pages[i]}}">
+      <img src="{{images[i]}}" alt="your image">
       </a>
       <div class="caption">
         <h3>Title</h3>
         <p>...</p>
-         <p>...</p>
-          <p>...</p>
+         
        
       </div>
     </div>

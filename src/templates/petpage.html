@@ -10,7 +10,7 @@
 	<script src="http://apps.bdimg.com/libs/bootstrap/3.3.0/js/bootstrap.min.js"></script>
   <style >
         body{
-            padding-top: 50px; 
+            padding-top: 100px; 
         }
      
   </style>
@@ -26,7 +26,7 @@
             </div>
           <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
-              <li class="active"><a href={{url_for('submit_pet')}}>Home</a></li>
+              <li><a href={{url_for('submit_pet')}}>Home</a></li>
               <li><a href={{url_for('submit_pet')}}>About</a></li>
               <li><a href={{url_for('submit_pet')}}>Contact</a></li>
               <li><a href={{url_for('login')}}>登录</a></li>
@@ -39,6 +39,34 @@
           </div>
         </div>
     </nav>    
+
+<div class="container">
+
+      <img src="{{image}}" alt="your image">
+      <dl class="dl-horizontal">
+  
+  
+
+  <dt>标题</dt>
+  <dd>{{pet_title}}</dd>
+
+  <dt>物种</dt>
+  <dd>{{species}}</dd>
+
+  <dt>位置</dt>
+  <dd>{{location}}</dd>
+
+  <dt>联系方式</dt>
+  <dd>{{tel}}</dd>
+
+  <dt>备注</dt>
+  <dd>{{supplement}}</dd>
+</dl>
+      
+
+</div>
+
+
 
 </body>
 </html>
