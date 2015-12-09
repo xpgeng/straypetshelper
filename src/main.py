@@ -180,7 +180,32 @@ def check_pet():
     save_data(pet_title,species,location,tel,supplement, photo_url)
     return render_template("check.html", pet_title=pet_title,
             species=species, location=location, tel=tel, supplement=supplement)
-    
+
+@app.route('/show/<pet_species>', methods=['GET', 'POST'])
+def show(pet_species):
+    # for test
+    file = open('plist.txt')
+    images = file.readlines()
+    pet_ids = range(len(images))
+    pet_pages = ['/petpage/' + str(i) for i in pet_ids ]
+    num = len(images)
+
+    return render_template("show_pet.html",images=images,pet_species=pet_species,
+        pet_pages = pet_pages,num = num)
+
+@app.route('/petpage/<int:pet_id>')
+def show_post(pet_id):
+    # test:
+    pet_title = "流浪小狗"
+    species = "狗狗"
+    tel = "12131313"
+    location = "342342"
+    supplement = "242342"
+    image = "http://7xoysx.com1.z0.glb.clouddn.com/dog6.jpeg"
+    return render_template("petpage.html",pet_title=pet_title,
+            species=species, location=location, tel=tel, supplement=supplement,
+            image=image)
+
 
 #@app.route('/edit', methods=["POST"])
 #def edit():
@@ -193,6 +218,5 @@ def check_pet():
 
 #@app.route('/', methods=['POST'])
 
-
-if  __name__ == "__main__":
+if __name__ == "__main__":
     app.run(debug=True)
