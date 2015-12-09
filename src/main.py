@@ -120,6 +120,11 @@ def check_pet():
     return render_template("check.html", pet_title=pet_title,
             species=species, location=location, tel=tel, supplement=supplement)
     
+@app.route('/show_pet', methods=['GET', 'POST'])
+def showpet():
+    file = open('plist.txt')
+    images = file.readlines()
+    return render_template("show_pet.html",images=images)
 
 #@app.route('/edit', methods=["POST"])
 #def edit():
