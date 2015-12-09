@@ -126,7 +126,8 @@ def show(pet_species):
     images = file.readlines()
     return render_template("show_pet.html",images=images,pet_species=pet_species)
 
-
+@app.route('/petpage/<int:pet_id>')
+def show_post(post_id):
 
 #@app.route('/edit', methods=["POST"])
 #def edit():
