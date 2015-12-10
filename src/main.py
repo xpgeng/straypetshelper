@@ -92,9 +92,15 @@ def save_data(pet_title,species,location,tel,supplement, photo_url):
         to search according to datetime.
     """
     item_number = pets_number()
-    print item_number
+    #print item_number
+    print species
     kv = sae.kvdb.Client()
-    key = strftime("%y%m%d%H%M%S" , localtime())
+    if species == '狗狗':
+        key = str('d'+strftime("%y%m%d%H%M%S" , localtime()))
+    elif species == '猫猫':
+        key = str('c'+strftime("%y%m%d%H%M%S" , localtime()))
+    else:
+        key = str('e'+strftime("%y%m%d%H%M%S" , localtime()))
     print key
     now = time.time()
     value = {'pet_title':pet_title, 'species': species,'location':location, 
@@ -183,15 +189,20 @@ def check_pet():
 
 @app.route('/show/<pet_species>', methods=['GET', 'POST'])
 def show(pet_species):
-    # for test
-    file = open('plist.txt')
-    images = file.readlines()
-    pet_ids = range(len(images))
-    pet_pages = ['/petpage/' + str(i) for i in pet_ids ]
+    kv = sae.kvdb.Client()
+    if pet_species == 'dog':
+        prefix = 'd'
+    elif pet_species == 'cat':
+        prefix = 'c'
+    else:
+        prefix = 'e'
+    images = [ value['photo_url']  for key,value in kv.get_by_prefix(prefix)]
     num = len(images)
-
+    pet_pages = ['/petpage/'+ str(i) for i in range(num)]
+    kv.disconnect_all()
     return render_template("show_pet.html",images=images,pet_species=pet_species,
         pet_pages = pet_pages,num = num)
+
 
 @app.route('/petpage/<int:pet_id>')
 def show_post(pet_id):
