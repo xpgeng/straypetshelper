@@ -10,9 +10,12 @@ sys.setdefaultencoding('utf-8')
 import os
 import sae.kvdb
 import time
-from flask import Flask, request, render_template, url_for, send_from_directory, flash
+from flask import Flask, request, render_template, url_for, \
+    send_from_directory, flash, make_response, Response
+import hashlib 
 from time import strftime, localtime
 from werkzeug import secure_filename
+#import flask.ext.login as flask_login, UserMixin, login_required
 from sae.storage import Connection, Bucket
 from sae.ext.storage import monkey
 monkey.patch_all()
@@ -23,11 +26,14 @@ monkey.patch_all()
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
 
-
 app = Flask(__name__)
-app.secret_key = 'some_secret'
+app.secret_key = 'super secret string'
 #app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  #the max value of file size
+
+#login_manager = flask_login.LoginManager()
+#login_manager.init_app(app)
+
 
 
 
@@ -109,6 +115,8 @@ def save_data(pet_title,species,location,tel,supplement, photo_url):
     kv.disconnect_all()
 
 def save_user(username, password, email):
+    """重复注册还未解决
+    """
     usersnumber = users_number()
     kv = sae.kvdb.Client()
     user = str('u'+username) #防止用户输入数字与pet data的key 相撞, 同时能根据'u'快速搜索username
@@ -223,16 +231,25 @@ def show_post(pet_id):
             image=image)
 
 
-#@app.route('/edit', methods=["POST"])
-#def edit():
-#    content = request.form["editContent"]
-##    tags = tags_process(request.form["editTags"])
-#    data_store(content, tags)
-#    flash("数据提交成功")
-#    return redirect( url_for('index') )
+@app.route('/wechat_auth', methods=['GET', 'POST'])
+def wechat_auth():  
+    if request.method == 'GET':  
+        token = 'xxxxxxxxxxx' # your token  
+        query = request.args  # GET 方法附上的参数  
+        signature = query.get('signature', '')  
+        timestamp = query.get('timestamp', '')  
+        nonce = query.get('nonce', '')  
+        echostr = query.get('echostr', '')  
+        s = [timestamp, nonce, token]  
+        s.sort()  
+        s = ''.join(s)  
+        if ( hashlib.sha1(s).hexdigest() == signature ):    
+            return make_response(echostr)
 
+#@app.route('/wechat', methods['GET', 'POST'])
+#def 
+# Here is used for wechat interaction
 
-#@app.route('/', methods=['POST'])
 
 if __name__ == "__main__":
     app.run(debug=True)
