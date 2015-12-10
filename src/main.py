@@ -198,21 +198,26 @@ def show(pet_species):
         prefix = 'e'
     images = [ value['photo_url']  for key,value in kv.get_by_prefix(prefix)]
     num = len(images)
-    pet_pages = ['/petpage/'+ str(i) for i in range(num)]
+    pet_pages = ['/petpage/'+ key for key, value in kv.get_by_prefix(prefix)]
     kv.disconnect_all()
     return render_template("show_pet.html",images=images,pet_species=pet_species,
         pet_pages = pet_pages,num = num)
 
 
-@app.route('/petpage/<int:pet_id>')
+@app.route('/petpage/<pet_id>')
 def show_post(pet_id):
     # test:
-    pet_title = "流浪小狗"
-    species = "狗狗"
-    tel = "12131313"
-    location = "342342"
-    supplement = "242342"
-    image = "http://7xoysx.com1.z0.glb.clouddn.com/dog6.jpeg"
+    print pet_id
+    kv = sae.kvdb.Client()
+    pet_id = str(pet_id)
+    pet_title = kv.get(pet_id)['pet_title']
+    species = kv.get(pet_id)['species']
+    tel = kv.get(pet_id)['tel']
+    location = kv.get(pet_id)['location']
+    supplement = kv.get(pet_id)['supplement']
+    image = kv.get(pet_id)['photo_url']
+    print pet_title, species, tel, location, supplement, image
+    kv.disconnect_all()
     return render_template("petpage.html",pet_title=pet_title,
             species=species, location=location, tel=tel, supplement=supplement,
             image=image)
