@@ -23,5 +23,7 @@ def gitmaster(f='src', m='Commit something to master...', b='fix-html'):
 		    '&& git add {filename}'
 		    '&& git commit -am "{msg}"'
 		    '&& git push origin "{branch}"'
-		    '&& date'.format(filename= f , msg = m , branch = b)
+		    '&& date'
+		    '&& touch worklog.md'
+		    '"- {msg}" >> worklog.md'.format(filename= f , msg = m , branch = b)
         )
