@@ -232,6 +232,11 @@ def show_post(pet_id):
             species=species, location=location, tel=tel, supplement=supplement,
             image=image)
 
+@app.route('/about_us')
+def about_us():
+    return render_template("about_us.html")
+
+
 
 @app.route('/wechat_auth', methods=['GET', 'POST'])
 def wechat_auth():  
