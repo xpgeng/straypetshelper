@@ -10,8 +10,7 @@ sys.setdefaultencoding('utf-8')
 import os
 import sae.kvdb
 import time
-from flask import Flask, request, render_template, url_for, \
-    send_from_directory, flash, make_response, Response
+from flask import Flask, request, render_template, url_for, send_from_directory, flash, make_response, Response, redirect
 import hashlib 
 from time import strftime, localtime
 from werkzeug import secure_filename
@@ -22,15 +21,12 @@ from sae.ext.storage import monkey
 monkey.patch_all()
 
 #####################constant variables#######################
-#ROOT = os.path.dirname(os.path.abspath(__file__))
-#UPLOAD_FOLDER = ROOT+'/uploads'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
 
 app = Flask(__name__)
 app.secret_key = 'super secret string'
-#app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  #the max value of file size
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
 ###############login manager#################################
 login_manager = LoginManager()
@@ -125,8 +121,6 @@ def save_data(pet_title,species,location,tel,supplement, photo_url):
         to search according to datetime.
     """
     item_number = pets_number()
-    #print item_number
-    print species
     kv = sae.kvdb.Client()
     if species == '狗狗':
         key = str('d'+strftime("%y%m%d%H%M%S" , localtime()))
@@ -140,6 +134,7 @@ def save_data(pet_title,species,location,tel,supplement, photo_url):
         'tel':tel, 'supplement':supplement, 'photo_url':photo_url,'time':now}
     kv.set(key, value)
     kv.disconnect_all()
+    return key
 
 def save_user(username, password, email):
     """
@@ -162,7 +157,6 @@ def check_login(username,password):
     pwhash = kv.get(key)['password']
     if check_password_hash(pwhash, password):
         return True
-        print 12580
     else:
         return False
 
@@ -191,11 +185,9 @@ def check_pet():
     if pet_photo and allowed_file(pet_photo.filename):
         filename = secure_filename(pet_photo.filename)
         renew_filename = check_filename(filename)
-        #pet_photo.save(os.path.join(app.config['UPLOAD_FOLDER'], renew_filename))
         photo_url = save_image_return_url(renew_filename, pet_photo)
-    save_data(pet_title,species,location,tel,supplement, photo_url)
-    return render_template("check.html", pet_title=pet_title,
-            species=species, location=location, tel=tel, supplement=supplement)
+    petkey = save_data(pet_title,species,location,tel,supplement, photo_url)
+    return redirect(url_for("show_post", pet_id=petkey))
 
 
 @app.route('/signup', methods=['GET','POST'])
@@ -228,10 +220,9 @@ def login():
         if not check_login(username,password):
             message = '用户名或密码不正确'
         else:
-            #flash('登陆成功')
-            #return redirect(url_for('submit_pet'))
             message = '登录成功!'
     return render_template('login.html', message = message)
+
 
 
 @app.route('/show/<pet_species>', methods=['GET', 'POST'])
@@ -246,14 +237,15 @@ def show(pet_species):
     images = [ value['photo_url']  for key,value in kv.get_by_prefix(prefix)]
     num = len(images)
     pet_pages = ['/petpage/'+ key for key, value in kv.get_by_prefix(prefix)]
+    pet_title = [ value['pet_title']  for key,value in kv.get_by_prefix(prefix)]
+    pet_location = [ value['location']  for key,value in kv.get_by_prefix(prefix)]
     kv.disconnect_all()
     return render_template("show_pet.html",images=images,pet_species=pet_species,
-        pet_pages = pet_pages,num = num)
+        pet_pages = pet_pages,pet_title = pet_title, pet_location=pet_location,num = num)
 
 
 @app.route('/petpage/<pet_id>')
 def show_post(pet_id):
-    # test:
     print pet_id
     kv = sae.kvdb.Client()
     pet_id = str(pet_id)
@@ -268,6 +260,12 @@ def show_post(pet_id):
     return render_template("petpage.html",pet_title=pet_title,
             species=species, location=location, tel=tel, supplement=supplement,
             image=image)
+
+
+@app.route('/about_us')
+def about_us():
+    return render_template("about_us.html")
+
 
 
 @app.route('/wechat_auth', methods=['GET', 'POST'])
