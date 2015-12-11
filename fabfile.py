@@ -14,13 +14,14 @@ def gitbranch(m='Commit something to branch...'):
         )
 
 
-def gitmaster(f='src && README.md', m='Commit something to master...'):
+def gitmaster(f='src', m='Commit something to master...', b='fix-html'):
 	'''gitmaster:f = "ADD FILENAMES"\t(default as 'src && README.md'), 
 	          m = "COMMIT LOGGING"\t(default as 'Commit something to master...')
+	          b = "Branch name"\t(default as 'fix-html')
 	'''	
 	local('pwd'		    
 		    '&& git add {filename}'
 		    '&& git commit -am "{msg}"'
-		    '&& git push origin feature/web-framework'
-		    '&& date'.format(filename= f , msg = m )
+		    '&& git push origin "{branch}"'
+		    '&& date'.format(filename= f , msg = m , branch = b)
         )

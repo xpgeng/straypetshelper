@@ -113,6 +113,7 @@ def save_data(pet_title,species,location,tel,supplement, photo_url):
         'tel':tel, 'supplement':supplement, 'photo_url':photo_url,'time':now}
     kv.set(key, value)
     kv.disconnect_all()
+    return item_number
 
 def save_user(username, password, email):
     """重复注册还未解决
@@ -192,8 +193,9 @@ def check_pet():
         #pet_photo.save(os.path.join(app.config['UPLOAD_FOLDER'], renew_filename))
         photo_url = save_image_return_url(renew_filename, pet_photo)
     save_data(pet_title,species,location,tel,supplement, photo_url)
-    return render_template("check.html", pet_title=pet_title,
-            species=species, location=location, tel=tel, supplement=supplement)
+    return url_for("show_post", pet_title=pet_title,
+            species=species, location=location, tel=tel, supplement=supplement,
+            image=photo_url)
 
 @app.route('/show/<pet_species>', methods=['GET', 'POST'])
 def show(pet_species):
