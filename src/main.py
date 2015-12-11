@@ -10,8 +10,7 @@ sys.setdefaultencoding('utf-8')
 import os
 import sae.kvdb
 import time
-from flask import Flask, request, render_template, url_for, \
-    send_from_directory, flash, make_response, Response, redirect
+from flask import Flask, request, render_template, url_for, send_from_directory, flash, make_response, Response, redirect
 import hashlib 
 from time import strftime, localtime
 from werkzeug import secure_filename
@@ -21,15 +20,12 @@ from sae.ext.storage import monkey
 monkey.patch_all()
 
 #####################constant variables#######################
-#ROOT = os.path.dirname(os.path.abspath(__file__))
-#UPLOAD_FOLDER = ROOT+'/uploads'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
 
 app = Flask(__name__)
 app.secret_key = 'super secret string'
-#app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  #the max value of file size
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
 #login_manager = flask_login.LoginManager()
 #login_manager.init_app(app)
@@ -98,8 +94,6 @@ def save_data(pet_title,species,location,tel,supplement, photo_url):
         to search according to datetime.
     """
     item_number = pets_number()
-    #print item_number
-    print species
     kv = sae.kvdb.Client()
     if species == '狗狗':
         key = str('d'+strftime("%y%m%d%H%M%S" , localtime()))
@@ -116,11 +110,11 @@ def save_data(pet_title,species,location,tel,supplement, photo_url):
     return key
 
 def save_user(username, password, email):
-    """重复注册还未解决
+    """
     """
     usersnumber = users_number()
     kv = sae.kvdb.Client()
-    user = str('u'+username) #防止用户输入数字与pet data的key 相撞, 同时能根据'u'快速搜索username
+    user = str('u'+username)
     now = time.time()
     message = {'username':username, 'password':password, 'email':email, 'time':now}
     kv.set(user, message)
@@ -135,7 +129,6 @@ def check_login(username,password):
     print key
     if password == kv.get(key)['password']:
         return True
-        print 12580
     else:
         return False
 
@@ -172,8 +165,6 @@ def login():
         if not check_login(username,password):
             message = '用户名或密码不正确'
         else:
-            #flash('登陆成功')
-            #return redirect(url_for('submit_pet'))
             message = '登录成功!'
     return render_template('login.html', message = message)
 
@@ -190,7 +181,6 @@ def check_pet():
     if pet_photo and allowed_file(pet_photo.filename):
         filename = secure_filename(pet_photo.filename)
         renew_filename = check_filename(filename)
-        #pet_photo.save(os.path.join(app.config['UPLOAD_FOLDER'], renew_filename))
         photo_url = save_image_return_url(renew_filename, pet_photo)
     petkey = save_data(pet_title,species,location,tel,supplement, photo_url)
     return redirect(url_for("show_post", pet_id=petkey))
@@ -216,7 +206,6 @@ def show(pet_species):
 
 @app.route('/petpage/<pet_id>')
 def show_post(pet_id):
-    # test:
     print pet_id
     kv = sae.kvdb.Client()
     pet_id = str(pet_id)
