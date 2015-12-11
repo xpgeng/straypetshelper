@@ -10,7 +10,7 @@
 	<script src="http://apps.bdimg.com/libs/bootstrap/3.3.0/js/bootstrap.min.js"></script>
   <style >
         body{
-            padding-top: 50px; 
+            padding-top: 80px; 
         }
      
   </style>
@@ -49,16 +49,23 @@
 {% for i in range(num) %}
 
   <div class="col-sm-4 col-md-3">
+  <a href="{{pet_pages[i]}}" title="点击查看TA的详细信息">
     <div class="thumbnail">
-      <a href="{{pet_pages[i]}}">
+      
       <img src="{{images[i]}}" alt="your image">
-      </a>
+      
       <div class="caption">
-        <h3>Title</h3>
-        <p>...</p>
-         
+
+        <h3>{{pet_title[i]}}</h3>
+        <p> 
+        <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span> {{pet_location[i]}}
+        <span class="glyphicon glyphicon-time" aria-hidden="true"></span> 
+        {{pet_pages[i][10:12]+'/'+pet_pages[i][12:14]+'/'+pet_pages[i][14:16]}}
+        </p>
+         </div>
+         </a>
        
-      </div>
+     
     </div>
   </div>
 {% endfor %}

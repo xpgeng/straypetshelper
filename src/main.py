@@ -11,7 +11,7 @@ import os
 import sae.kvdb
 import time
 from flask import Flask, request, render_template, url_for, \
-    send_from_directory, flash, make_response, Response
+    send_from_directory, flash, make_response, Response, redirect
 import hashlib 
 from time import strftime, localtime
 from werkzeug import secure_filename
@@ -113,7 +113,7 @@ def save_data(pet_title,species,location,tel,supplement, photo_url):
         'tel':tel, 'supplement':supplement, 'photo_url':photo_url,'time':now}
     kv.set(key, value)
     kv.disconnect_all()
-    return item_number
+    return key
 
 def save_user(username, password, email):
     """重复注册还未解决
@@ -192,10 +192,8 @@ def check_pet():
         renew_filename = check_filename(filename)
         #pet_photo.save(os.path.join(app.config['UPLOAD_FOLDER'], renew_filename))
         photo_url = save_image_return_url(renew_filename, pet_photo)
-    save_data(pet_title,species,location,tel,supplement, photo_url)
-    return url_for("show_post", pet_title=pet_title,
-            species=species, location=location, tel=tel, supplement=supplement,
-            image=photo_url)
+    petkey = save_data(pet_title,species,location,tel,supplement, photo_url)
+    return redirect(url_for("show_post", pet_id=petkey))
 
 @app.route('/show/<pet_species>', methods=['GET', 'POST'])
 def show(pet_species):
@@ -209,9 +207,11 @@ def show(pet_species):
     images = [ value['photo_url']  for key,value in kv.get_by_prefix(prefix)]
     num = len(images)
     pet_pages = ['/petpage/'+ key for key, value in kv.get_by_prefix(prefix)]
+    pet_title = [ value['pet_title']  for key,value in kv.get_by_prefix(prefix)]
+    pet_location = [ value['location']  for key,value in kv.get_by_prefix(prefix)]
     kv.disconnect_all()
     return render_template("show_pet.html",images=images,pet_species=pet_species,
-        pet_pages = pet_pages,num = num)
+        pet_pages = pet_pages,pet_title = pet_title, pet_location=pet_location,num = num)
 
 
 @app.route('/petpage/<pet_id>')
