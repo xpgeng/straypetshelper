@@ -15,7 +15,8 @@ from flask import Flask, request, render_template, url_for, \
 import hashlib 
 from time import strftime, localtime
 from werkzeug import secure_filename
-#import flask.ext.login as flask_login, UserMixin, login_required
+from werkzeug.security import generate_password_hash, check_password_hash
+#import flask.ext.login as UserMixin, login_required
 from sae.storage import Connection, Bucket
 from sae.ext.storage import monkey
 monkey.patch_all()
@@ -31,10 +32,36 @@ app.secret_key = 'super secret string'
 #app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  #the max value of file size
 
-#login_manager = flask_login.LoginManager()
-#login_manager.init_app(app)
+###############login manager#################################
+login_manager = LoginManager()
+login_manager.init_app(app)
 
 
+
+
+
+#class User(UserMixin):
+    #pass
+    #def __init__(self, name, id, active=True):
+    #    self.name = name
+    #    self.id = id
+    #    self.active = active
+
+    #def is_active(self):
+        # Here you should write whatever the code is
+        # that checks the database if your user is active
+        #return self.active
+
+    #def is_anonymous(self):
+    #    return False
+
+    #def is_authenticated(self):
+        #return True
+
+##用户回调
+#@login_manager.user_loader
+#def load_user(userid):    
+#    return User.get(userid)
 
 
 def allowed_file(filename):
@@ -115,13 +142,14 @@ def save_data(pet_title,species,location,tel,supplement, photo_url):
     kv.disconnect_all()
 
 def save_user(username, password, email):
-    """重复注册还未解决
+    """
     """
     usersnumber = users_number()
     kv = sae.kvdb.Client()
-    user = str('u'+username) #防止用户输入数字与pet data的key 相撞, 同时能根据'u'快速搜索username
+    user = str('u'+username)
     now = time.time()
-    message = {'username':username, 'password':password, 'email':email, 'time':now}
+    pwhash = generate_password_hash(password) #hash加密
+    message = {'username':username, 'password':pwhash, 'email':email, 'time':now}
     kv.set(user, message)
     kv.disconnect_all()
 
@@ -131,51 +159,25 @@ def check_login(username,password):
     """
     kv = sae.kvdb.Client()
     key = str('u'+username)
-    print key
-    if password == kv.get(key)['password']:
+    pwhash = kv.get(key)['password']
+    if check_password_hash(pwhash, password):
         return True
         print 12580
     else:
         return False
 
+def check_user(username):
+    kv = sae.kvdb.Client()
+    key = str('u'+username)
+    if kv.get(key):
+        return True
+    else:
+        return False
 
 
 @app.route('/')
 def submit_pet():
     return render_template("index.html")
-
-@app.route('/signup', methods=['GET','POST'])
-def sign_up():
-    message = None
-    print request.method
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        email = request.form['email']
-        confirmpassword = request.form['confirmpassword']
-        print username, password, email, confirmpassword
-        if password == confirmpassword:
-            save_user(username, password, email)
-            message = '注册成功!'
-        else:
-            message = '对不起,系统维护ing...'
-    return render_template("signup.html", message = message)
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    message = None
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        print username, password
-        if not check_login(username,password):
-            message = '用户名或密码不正确'
-        else:
-            #flash('登陆成功')
-            #return redirect(url_for('submit_pet'))
-            message = '登录成功!'
-    return render_template('login.html', message = message)
-
 
 
 @app.route('/', methods=['POST'])
@@ -194,6 +196,43 @@ def check_pet():
     save_data(pet_title,species,location,tel,supplement, photo_url)
     return render_template("check.html", pet_title=pet_title,
             species=species, location=location, tel=tel, supplement=supplement)
+
+
+@app.route('/signup', methods=['GET','POST'])
+def sign_up():
+    message = None
+    print request.method
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        email = request.form['email']
+        confirmpassword = request.form['confirmpassword']
+        print username, password, email, confirmpassword
+        if check_user(username):
+            message = '对不起, 您的用户名已经被注册.'
+        elif password == confirmpassword:
+            save_user(username, password, email)
+            message = '注册成功!'
+        else:
+            message = '对不起,系统维护ing...'
+    return render_template("signup.html", message = message)
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    message = None
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        print username, password
+        if not check_login(username,password):
+            message = '用户名或密码不正确'
+        else:
+            #flash('登陆成功')
+            #return redirect(url_for('submit_pet'))
+            message = '登录成功!'
+    return render_template('login.html', message = message)
+
 
 @app.route('/show/<pet_species>', methods=['GET', 'POST'])
 def show(pet_species):
