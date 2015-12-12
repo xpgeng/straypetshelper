@@ -234,7 +234,7 @@ def show_post(pet_id):
 
 @app.route('/about_us')
 def about_us():
-    return render_template("about_us.html")
+    return render_template("us_about.html")
 
 
 
