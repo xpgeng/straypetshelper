@@ -30,7 +30,6 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
 
 app = Flask(__name__)
-app.debug = True
 app.secret_key = "a_random_secret_key_$%#!@"
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config["REMEMBER_COOKIE_DURATION"] = timedelta(days=14)
@@ -160,8 +159,10 @@ def save_data(pet_title,species,location,tel,supplement, photo_url):
         key = str('e'+strftime("%y%m%d%H%M%S" , localtime()))
     print key
     now = time.time()
+    date = strftime("%Y/%m/%d", localtime(now))
     value = {'pet_title':pet_title, 'species': species,'location':location, 
-        'tel':tel, 'supplement':supplement, 'photo_url':photo_url,'time':now}
+            'tel':tel, 'supplement':supplement, 'photo_url':photo_url,
+            'time':now, 'date':date}
     kv.set(key, value)
     kv.disconnect_all()
     return key
@@ -211,7 +212,7 @@ def check_user(username):
 
 @app.route('/')
 def submit_pet():
-    #user_id = (current_user.get_id()) or None)
+    #user_id = (current_user.get_id()) or None) 
     return render_template("index.html")#user_id=user_id
 
 
@@ -223,12 +224,26 @@ def check_pet():
     tel = request.form['tel']
     supplement = request.form['supplement']
     pet_photo = request.files['petphoto']
+    #query = request.form['query']
+    #if query:
+    #    return redirect(url_for('search'), query=query)
     if pet_photo and allowed_file(pet_photo.filename):
         filename = secure_filename(pet_photo.filename)
         renew_filename = check_filename(filename)
         photo_url = save_image_return_url(renew_filename, pet_photo)
     petkey = save_data(pet_title,species,location,tel,supplement, photo_url)
     return redirect(url_for("show_post", pet_id=petkey))
+
+
+#@app.route('/search/<query>')
+#def search(query):
+#    kv = sae.kvdb.Client()
+#    dog_message = kv.get_by_prefix('d')
+#    cat_message = kv.get_by_prefix('c')
+#    else_message = kv.get_by_prefix('e')
+#    if 
+
+
 
 
 @app.route('/signup', methods=['GET','POST'])
@@ -247,6 +262,8 @@ def sign_up():
             save_user(username, password, email)
             add_to_userset(username)
             message = '注册成功!'
+            flash('注册成功')
+            return redirect('/login')
         else:
             message = '对不起,系统维护ing...'      
     return render_template("signup.html", message = message)
