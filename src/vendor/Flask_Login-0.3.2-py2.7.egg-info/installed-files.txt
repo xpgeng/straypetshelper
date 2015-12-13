@@ -1,0 +1,10 @@
+../flask_login.py
+../flask_login.pyc
+./
+PKG-INFO
+version_info.json
+dependency_links.txt
+top_level.txt
+not-zip-safe
+SOURCES.txt
+requires.txt
