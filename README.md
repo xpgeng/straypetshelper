@@ -1,6 +1,6 @@
 # 带它回家-Stray Pets Helper
 
-[点这里](testpet.sinaapp.com)帮我们测试吧：）
+[点这里](http://testpet.sinaapp.com)帮我们测试吧：）
 [点这里](https://github.com/xpgeng/straypetshelper/issues/22)吐嘈、给建议
 
 
