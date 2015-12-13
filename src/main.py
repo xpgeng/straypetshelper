@@ -25,6 +25,9 @@ from itsdangerous import URLSafeTimedSerializer
 from datetime import timedelta
 monkey.patch_all()
 
+
+from user import save_user, users_number, check_user, check_login, add_to_userset
+from pet import pets_number, save_data
 #####################constant variables#######################
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
@@ -46,7 +49,6 @@ login_manager.init_app(app)
 class User(UserMixin):
     
     def __init__(self, userid, password):
-        #self.name = username
         self.id =userid 
         self.password = password
     
@@ -115,100 +117,6 @@ def save_image_return_url(filename, file):
     return bucket.generate_url(filename)
 
 
-def pets_number():
-    """
-        count the number of  the pets
-    """
-    kv = sae.kvdb.Client()
-    if kv.get('petsnumber'):
-        number = kv.get('petsnumber') + 1
-        kv.replace('petsnumber', number)
-        return number
-    else:
-        kv.set('petsnumber', 1)
-        return 1
-    kv.disconnect_all()
-
-def users_number():
-    """
-        count the number of  the pets
-    """
-    kv = sae.kvdb.Client()
-    if kv.get('usersnumber'):
-        number = kv.get('usersnumber') + 1
-        kv.replace('usersnumber', number)
-        return number
-    else:
-        kv.set('usersnumber', 1)
-        return 1
-    kv.disconnect_all()
-
-
-def save_data(pet_title,species,location,tel,supplement, photo_url):
-    """
-        key is like this form: 151204112340 which is convenient
-        to search according to datetime.
-    """
-    item_number = pets_number()
-    kv = sae.kvdb.Client()
-    if species == '狗狗':
-        key = str('d'+strftime("%y%m%d%H%M%S" , localtime()))
-    elif species == '猫猫':
-        key = str('c'+strftime("%y%m%d%H%M%S" , localtime()))
-    else:
-        key = str('e'+strftime("%y%m%d%H%M%S" , localtime()))
-    print key
-    now = time.time()
-    date = strftime("%Y/%m/%d", localtime(now))
-    value = {'pet_title':pet_title, 'species': species,'location':location, 
-            'tel':tel, 'supplement':supplement, 'photo_url':photo_url,
-            'time':now, 'date':date}
-    kv.set(key, value)
-    kv.disconnect_all()
-    return key
-
-def save_user(username, password, email):
-    """
-    """
-    usersnumber = users_number()
-    kv = sae.kvdb.Client()
-    now = time.time()
-    pwhash = generate_password_hash(password) #hash加密
-    message = {'username':username, 'password':pwhash, 'email':email, 'time':now}
-    kv.set(str(username), message)
-    kv.disconnect_all()
-
-def add_to_userset(username):
-    kv = sae.kvdb.Client()
-    if kv.get('userset'):
-        users = kv.get('userset')
-        users.append(str(username))
-        kv.set ('userset',users)
-    else:
-        users = []
-        users.append(str(username))
-        kv.set('userset', users)
-    kv.disconnect_all()
-
-def check_login(username,password):
-    """
-    """
-    kv = sae.kvdb.Client()
-    pwhash = kv.get(str(username))['password']
-    print pwhash
-    if check_password_hash(pwhash, password):
-        return True
-    else:
-        return False
-
-def check_user(username):
-    kv = sae.kvdb.Client()
-    if kv.get(str(username)):
-        return True       
-    else:
-        return False        
-    kv.disconnect_all()
-
 
 @app.route('/')
 def submit_pet():
@@ -218,30 +126,34 @@ def submit_pet():
 
 @app.route('/', methods=['POST'])
 def check_pet():
+    user_id = current_user.get_id()
     pet_title = request.form['pet-title']
     species = request.form['species']
     location = request.form['location']
     tel = request.form['tel']
     supplement = request.form['supplement']
     pet_photo = request.files['petphoto']
-    #query = request.form['query']
-    #if query:
-    #    return redirect(url_for('search'), query=query)
+    query = request.form['query']
+    if query:
+        return redirect(url_for('search'), query=query)
     if pet_photo and allowed_file(pet_photo.filename):
         filename = secure_filename(pet_photo.filename)
         renew_filename = check_filename(filename)
         photo_url = save_image_return_url(renew_filename, pet_photo)
-    petkey = save_data(pet_title,species,location,tel,supplement, photo_url)
+    petkey = save_data(pet_title,species,location,tel,supplement, photo_url, user_id)
     return redirect(url_for("show_post", pet_id=petkey))
 
 
-#@app.route('/search/<query>')
-#def search(query):
-#    kv = sae.kvdb.Client()
-#    dog_message = kv.get_by_prefix('d')
-#    cat_message = kv.get_by_prefix('c')
-#    else_message = kv.get_by_prefix('e')
-#    if 
+@app.route('/search/<query>')
+def search(query):
+    kv = sae.kvdb.Client()
+    dog_keys = kv.get('dogset')
+    cat_keys = kv.get('catset')
+    else_keys = kv.get_by_prefix('elsepetset')
+    results = []
+    if query in [ value['pet-title'] for key,value in kv.get_multi(dog_keys)]:
+        results.append(key)
+    elif 
 
 
 
