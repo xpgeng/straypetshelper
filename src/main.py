@@ -62,12 +62,14 @@ class User(UserMixin):
     def get(userid):
         kv = sae.kvdb.Client()
         userset = kv.get('userset')
-        for username in userset:
-            if username == userid:
-                password = kv.get(str(username))['password']
-                return User(username, password)
-
-        return None
+        if userset:
+            for username in userset:
+                if username == userid:
+                    password = kv.get(str(username))['password']
+                    return User(username, password)
+            kv = sae.kvdb.Client()
+        else:
+            return None
 
 
 @login_manager.user_loader
@@ -178,12 +180,12 @@ def save_user(username, password, email):
 def add_to_userset(username):
     kv = sae.kvdb.Client()
     if kv.get('userset'):
-        users = kv.get(userset)
+        users = kv.get('userset')
         users.append(str(username))
-        kv.set ('useuset',users)
+        kv.set ('userset',users)
     else:
         users = []
-        users.append(username)
+        users.append(str(username))
         kv.set('userset', users)
     kv.disconnect_all()
 
