@@ -1,4 +1,6 @@
 import sae
+sae.add_vendor_dir('vendor')
+
 from main import app
 
 sae.add_vendor_dir('vendor')
