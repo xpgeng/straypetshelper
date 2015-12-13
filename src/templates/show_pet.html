@@ -40,18 +40,23 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-              <a href={{url_for('submit_pet')}} class="navbar-brand">带TA回家</a>
+           
+              <a href={{url_for('show', pet_species = 'all')}} class="navbar-brand">带TA回家</a>
+          
             </div>
 
           <div id="bs-example-navbar-collapse-1" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
 
               {% if pet_species == 'dog' %}
-              <li><a href='/show/cat'>流浪猫</a></li>
-              <li class="active"><a href='/show/dog'>流浪狗</a></li>
+              <li><a href={{url_for('show', pet_species = 'cat')}}>流浪猫</a></li>
+              <li class="active"><a href={{url_for('show', pet_species = 'dog')}}>流浪狗</a></li>
               {% elif pet_species == 'cat' %}
-               <li class="active"><a href='/show/cat'>流浪猫</a></li>
-              <li><a href='/show/dog'>流浪狗</a></li>
+               <li class="active"><a href={{url_for('show', pet_species = 'cat')}}>流浪猫</a></li>
+              <li><a href={{url_for('show', pet_species = 'dog')}}>流浪狗</a></li>
+              {% else %}
+              <li><a href={{url_for('show', pet_species = 'cat')}}>流浪猫</a></li>
+              <li><a href={{url_for('show', pet_species = 'dog')}}>流浪狗</a></li>
               {% endif %}
 
                <li><a href={{url_for('submit_pet')}}>发布</a></li>
@@ -96,7 +101,7 @@
         <p> 
         <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span> {{pet_location[i]}}
         <span class="glyphicon glyphicon-time" aria-hidden="true"></span> 
-        {{pet_pages[i][10:12]+'/'+pet_pages[i][12:14]+'/'+pet_pages[i][14:16]}}
+        {{pet_year[i]+'/'+pet_mon[i]+'/'+pet_mday[i]}}
         </p>
          </div>
          </div>
