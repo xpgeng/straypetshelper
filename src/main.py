@@ -24,7 +24,8 @@ from sae.ext.storage import monkey
 from itsdangerous import URLSafeTimedSerializer
 from datetime import timedelta
 from fun_user import save_user, users_number, check_user, check_login, add_to_userset
-from pet import pets_number, save_data, del_pet
+from pet import pets_number, save_data, change_sequence, del_pet
+
 monkey.patch_all()
 
 #####################constant variables#######################
@@ -127,6 +128,7 @@ def submit_pet():
 @app.route('/submit', methods=['POST'])
 def checkin_pet():
     user_id = current_user.get_id()
+    print user_id
     pet_title = request.form['pet-title']
     species = request.form['species']
     location = request.form['location']
@@ -145,38 +147,26 @@ def checkin_pet():
 def search_result():
     query = request.form['query']
     query = str(query)
+    print query
     if not query:
         return render_template("nullpage.html")
     kv = sae.kvdb.Client()
     data = kv.get_by_prefix('s')
-    #print data
     results = []
     for key, value in data:
         pet_item = [value['pet_title'], value['species'], value['location'],\
             value['supplement'], value['date'], value['username']]
         for item in pet_item:
-            if query in item:
-                print 6666666
+            if query in str(item):
                 results.append(key)
-                print results
-                print type(kv.get_multi(results).items())
-                images = [ value['photo_url']  for key,value in kv.get_multi(results).items()]
-                num = len(images)
-                pet_pages = ['/petpage/'+ key for key, value in kv.get_multi(results).items()]
-                pet_title = [ value['pet_title']  for key,value in kv.get_multi(results).items()]
-                pet_species = [ value['species']  for key,value in kv.get_multi(results).items()]
-                pet_location = [ value['location']  for key,value in kv.get_multi(results).items()]
-                pet_year = [ str(time.localtime(value['time']).tm_year)  for key,value in kv.get_multi(results).items()]
-                pet_mon = [ str(time.localtime(value['time']).tm_mon)  for key,value in kv.get_multi(results).items()]
-                pet_mday = [ str(time.localtime(value['time']).tm_mday)  for key,value in kv.get_multi(results).items()]
-                print 123            
-                return render_template("show_pet.html",images=images,pet_species=pet_species,
-                pet_pages = pet_pages,pet_title = pet_title, pet_location=pet_location, 
-                pet_year = pet_year, pet_mon=pet_mon,pet_mday=pet_mday,
-                num = num)
-            else:
-                print 456
-                return render_template("nullpage.html")
+    if results:
+        print type(kv.get_multi(results).items())
+        pet_dict = kv.get_multi(results).items()
+        pet_dict = change_sequence(pet_dict)
+        return render_template('show_dict.html', pet_dict=pet_dict)
+    else:
+        print 456
+        return render_template("nullpage.html")
 
 
 @app.route('/signup', methods=['GET','POST'])
@@ -237,25 +227,11 @@ def show(pet_species):
         prefix = 's:'
     else:
         prefix = 's:e'
-
     keys = [key for key, value in kv.get_by_prefix(prefix)]
     pet_dict = kv.get_multi(keys).items()
+    pet_dict = change_sequence(pet_dict)
     return render_template('show_dict.html', pet_dict=pet_dict)
     
-
-    #images = [ value['photo_url']  for key,value in kv.get_by_prefix(prefix)]
-    #num = len(images)
-    #pet_pages = ['/petpage/'+ key for key, value in kv.get_by_prefix(prefix)]
-    #pet_title = [ value['pet_title']  for key,value in kv.get_by_prefix(prefix)]
-    #pet_location = [ value['location']  for key,value in kv.get_by_prefix(prefix)]
-    #pet_year = [ str(time.localtime(value['time']).tm_year)  for key,value in kv.get_by_prefix(prefix)]
-    #pet_mon = [ str(time.localtime(value['time']).tm_mon)  for key,value in kv.get_by_prefix(prefix)]
-    #pet_mday = [ str(time.localtime(value['time']).tm_mday)  for key,value in kv.get_by_prefix(prefix)]
-    #kv.disconnect_all()
-    #return render_template("show_pet.html",images=images,pet_species=pet_species,
-    #    pet_pages = pet_pages,pet_title = pet_title, pet_location=pet_location, 
-    #    pet_year = pet_year, pet_mon=pet_mon,pet_mday=pet_mday,
-    #    num = num)
     
 
 @app.route('/petpage/<pet_id>')
