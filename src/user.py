@@ -52,12 +52,17 @@ def check_login(username,password):
     """
     """
     kv = sae.kvdb.Client()
-    pwhash = kv.get(str(username))['password']
-    print pwhash
-    if check_password_hash(pwhash, password):
-        return True
+    if not username:
+        return False
+    elif kv.get(str(username)):
+        pwhash = kv.get(str(username))['password']
+        if check_password_hash(pwhash, password):
+            return True
+        else:
+            return False
     else:
         return False
+    kv.disconnect_all()
 
 def check_user(username):
     kv = sae.kvdb.Client()
