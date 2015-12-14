@@ -97,17 +97,13 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 
-def check_filename(filename):
+def process_filename(user_id,filename):
     """
         This funcion can solve the bug of omitting the Chinese characters in filename.
 
     """
-    if filename in ALLOWED_EXTENSIONS:
-        filename_new = "%s.%s" % (int(time.time()), filename)
-        return filename_new
-    else:
-        return filename
-
+    filename_new = "%s%s.%s" % (user_id, int(time.time()), filename)
+    return filename_new
 
 def save_image_return_url(filename, file):
     """ 
@@ -117,8 +113,6 @@ def save_image_return_url(filename, file):
     bucket = c.get_bucket('images')
     bucket.put_object(filename, file.read())
     return bucket.generate_url(filename)
-
-
 
 
 
@@ -144,7 +138,7 @@ def checkin_pet():
     pet_photo = request.files['petphoto']
     if pet_photo and allowed_file(pet_photo.filename):
         filename = secure_filename(pet_photo.filename)
-        renew_filename = check_filename(filename)
+        renew_filename = process_filename(user_id, filename)
         photo_url = save_image_return_url(renew_filename, pet_photo)
     petkey = save_data(pet_title,species,location,tel,supplement, photo_url, user_id)
     return redirect(url_for("show_post", pet_id=petkey))
@@ -246,19 +240,25 @@ def show(pet_species):
         prefix = 's:'
     else:
         prefix = 's:e'
-    images = [ value['photo_url']  for key,value in kv.get_by_prefix(prefix)]
-    num = len(images)
-    pet_pages = ['/petpage/'+ key for key, value in kv.get_by_prefix(prefix)]
-    pet_title = [ value['pet_title']  for key,value in kv.get_by_prefix(prefix)]
-    pet_location = [ value['location']  for key,value in kv.get_by_prefix(prefix)]
-    pet_year = [ str(time.localtime(value['time']).tm_year)  for key,value in kv.get_by_prefix(prefix)]
-    pet_mon = [ str(time.localtime(value['time']).tm_mon)  for key,value in kv.get_by_prefix(prefix)]
-    pet_mday = [ str(time.localtime(value['time']).tm_mday)  for key,value in kv.get_by_prefix(prefix)]
-    kv.disconnect_all()
-    return render_template("show_pet.html",images=images,pet_species=pet_species,
-        pet_pages = pet_pages,pet_title = pet_title, pet_location=pet_location, 
-        pet_year = pet_year, pet_mon=pet_mon,pet_mday=pet_mday,
-        num = num)
+
+    keys = [key for key, value in kv.get_by_prefix(prefix)]
+    pet_dict = kv.get_multi(keys).items()
+    return render_template('show_dict.html', pet_dict=pet_dict)
+    
+
+    #images = [ value['photo_url']  for key,value in kv.get_by_prefix(prefix)]
+    #num = len(images)
+    #pet_pages = ['/petpage/'+ key for key, value in kv.get_by_prefix(prefix)]
+    #pet_title = [ value['pet_title']  for key,value in kv.get_by_prefix(prefix)]
+    #pet_location = [ value['location']  for key,value in kv.get_by_prefix(prefix)]
+    #pet_year = [ str(time.localtime(value['time']).tm_year)  for key,value in kv.get_by_prefix(prefix)]
+    #pet_mon = [ str(time.localtime(value['time']).tm_mon)  for key,value in kv.get_by_prefix(prefix)]
+    #pet_mday = [ str(time.localtime(value['time']).tm_mday)  for key,value in kv.get_by_prefix(prefix)]
+    #kv.disconnect_all()
+    #return render_template("show_pet.html",images=images,pet_species=pet_species,
+    #    pet_pages = pet_pages,pet_title = pet_title, pet_location=pet_location, 
+    #    pet_year = pet_year, pet_mon=pet_mon,pet_mday=pet_mday,
+    #    num = num)
     
 
 @app.route('/petpage/<pet_id>')
