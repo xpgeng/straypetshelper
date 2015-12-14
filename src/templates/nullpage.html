@@ -1,31 +1,47 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="utf-8" />
-	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>带TA回家</title>
-	<link rel="stylesheet" href="http://apps.bdimg.com/libs/bootstrap/3.3.0/css/bootstrap.min.css">	
+	<link rel="stylesheet" href="http://apps.bdimg.com/libs/bootstrap/3.3.0/css/bootstrap.min.css">
 	<script src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script>
 	<script src="http://apps.bdimg.com/libs/bootstrap/3.3.0/js/bootstrap.min.js"></script>
-  <style >
-       
-  </style>
+	<script type="text/javascript">
+	function readURL(input){
+		if (input.files && input.files[0]){
+			var reader = new FileReader();
 
+			reader.onload = function(e){
+				$('#blah').attr('src', e.target.result).width(150);
+			};
+			reader.readAsDataURL(input.files[0]);
+			document.getElementById("photo_help").innerHTML = "";
+		}
+	}</script>
+
+	<style >
+      
+        .starter{
+        	padding: 40px 15px;
+        	text-align: center;
+        }
+	</style>
 </head>
 <body>
 
-
-      <nav class="navbar navbar-inverse" role="navigation">
+         <nav class="navbar navbar-inverse" role="navigation">
         <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
-             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
                 <span class="sr-only">Toggle navigation</span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            
+
               <a href={{url_for('show', pet_species = 'all')}} class="navbar-brand">带TA回家</a>
             </div>
 
@@ -36,14 +52,14 @@
               <li><a href={{url_for('show', pet_species = 'dog')}}>流浪狗</a></li>
              
 
-               <li><a href={{url_for('submit_pet')}}>发布</a></li>
+               <li class="active"><a href={{url_for('submit_pet')}}>发布</a></li>
                <li><a href={{url_for('about_us')}}>关于我们</a></li>
 
             </ul>
 
-            <form class="navbar-form navbar-left" role="search">
+            <form class="navbar-form navbar-left" action={{url_for('search_result')}} role="search" method="POST">
               <div class="input-group">
-              <input type="text" class="form-control" id="query" placeholder="输入您的关键词" name="query">                
+              <input type="text" class="form-control" id="query" placeholder="输入您的关键词" name="query" value="{{ request.form.query}}">                
               <span class="input-group-btn">
               <button type="submit" class="btn btn-default"> <span class="glyphicon glyphicon-search" aria-hidden="true"> </span></button>
               </span>
@@ -59,29 +75,11 @@
         </div> <!-- container -->
     </nav>    
 
-<div class="container">
-<div class="col-sm-6 col-md-4">
-<div class="thumbnail">
-   <img src="{{image}}" alt="your image" width="400">
-</div>
-</div>
-
-<div class="col-sm-6 col-md-4">
-<h1>{{pet_title}}</h1>
-<p>
- <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span> {{location}}
-  </p>
-     
-  <p>{{species}}</p>
-
-  <p>联系方式：{{tel}}</p>
-
-  <p>备注：{{supplement}}</p>
-</div>
-
-</div>
-
-
+    <div class="container text-center">
+       <div class="starter">
+       <h1 >Sorry, 没找着呢...</h1>
+       </div>  
+    </div>
 
 </body>
 </html>

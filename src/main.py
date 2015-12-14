@@ -23,16 +23,17 @@ from sae.storage import Connection, Bucket
 from sae.ext.storage import monkey
 from itsdangerous import URLSafeTimedSerializer
 from datetime import timedelta
-monkey.patch_all()
-
-
 from user import save_user, users_number, check_user, check_login, add_to_userset
 from pet import pets_number, save_data
+import requests
+monkey.patch_all()
+
 #####################constant variables#######################
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
 
 app = Flask(__name__)
+app.debug = True
 app.secret_key = "a_random_secret_key_$%#!@"
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config["REMEMBER_COOKIE_DURATION"] = timedelta(days=14)
@@ -49,6 +50,7 @@ login_manager.init_app(app)
 class User(UserMixin):
     
     def __init__(self, userid, password):
+        #self.name = username
         self.id =userid 
         self.password = password
     
@@ -118,97 +120,6 @@ def save_image_return_url(filename, file):
 
 
 
-def pets_number():
-    """
-        count the number of  the pets
-    """
-    kv = sae.kvdb.Client()
-    if kv.get('petsnumber'):
-        number = kv.get('petsnumber') + 1
-        kv.replace('petsnumber', number)
-        return number
-    else:
-        kv.set('petsnumber', 1)
-        return 1
-    kv.disconnect_all()
-
-def users_number():
-    """
-        count the number of  the pets
-    """
-    kv = sae.kvdb.Client()
-    if kv.get('usersnumber'):
-        number = kv.get('usersnumber') + 1
-        kv.replace('usersnumber', number)
-        return number
-    else:
-        kv.set('usersnumber', 1)
-        return 1
-    kv.disconnect_all()
-
-
-def save_data(pet_title,species,location,tel,supplement, photo_url):
-    """
-        key is like this form: 151204112340 which is convenient
-        to search according to datetime.
-    """
-    item_number = pets_number()
-    kv = sae.kvdb.Client()
-    if species == '狗狗':
-        key = str('s:d'+strftime("%y%m%d%H%M%S" , localtime()))
-    elif species == '猫猫':
-        key = str('s:c'+strftime("%y%m%d%H%M%S" , localtime()))
-    else:
-        key = str('s:e'+strftime("%y%m%d%H%M%S" , localtime()))
-    print key
-    now = time.time()
-    value = {'pet_title':pet_title, 'species': species,'location':location, 
-        'tel':tel, 'supplement':supplement, 'photo_url':photo_url,'time':now}
-    kv.set(key, value)
-    kv.disconnect_all()
-    return key
-
-def save_user(username, password, email):
-    """
-    """
-    usersnumber = users_number()
-    kv = sae.kvdb.Client()
-    now = time.time()
-    pwhash = generate_password_hash(password) #hash加密
-    message = {'username':username, 'password':pwhash, 'email':email, 'time':now}
-    kv.set(str(username), message)
-    kv.disconnect_all()
-
-def add_to_userset(username):
-    kv = sae.kvdb.Client()
-    if kv.get('userset'):
-        users = kv.get('userset')
-        users.append(str(username))
-        kv.set ('userset',users)
-    else:
-        users = []
-        users.append(str(username))
-        kv.set('userset', users)
-    kv.disconnect_all()
-
-def check_login(username,password):
-    """
-    """
-    kv = sae.kvdb.Client()
-    pwhash = kv.get(str(username))['password']
-    print pwhash
-    if check_password_hash(pwhash, password):
-        return True
-    else:
-        return False
-
-def check_user(username):
-    kv = sae.kvdb.Client()
-    if kv.get(str(username)):
-        return True       
-    else:
-        return False        
-    kv.disconnect_all()
 
 
 @app.route('/')
@@ -216,18 +127,19 @@ def show_all():
     #user_id = (current_user.get_id()) or None)
     return redirect(url_for('show', pet_species = 'all'))#user_id=user_id
 
+@app.route('/submit')
+def submit_pet():
+    return render_template('index.html')
 
 @app.route('/submit', methods=['POST'])
 def checkin_pet():
+    user_id = current_user.get_id()
     pet_title = request.form['pet-title']
     species = request.form['species']
     location = request.form['location']
     tel = request.form['tel']
     supplement = request.form['supplement']
     pet_photo = request.files['petphoto']
-    query = request.form['query']
-    if query:
-        return redirect(url_for('search'), query=query)
     if pet_photo and allowed_file(pet_photo.filename):
         filename = secure_filename(pet_photo.filename)
         renew_filename = check_filename(filename)
@@ -236,18 +148,42 @@ def checkin_pet():
     return redirect(url_for("show_post", pet_id=petkey))
 
 
-@app.route('/search/<query>')
-def search(query):
+@app.route('/search_result', methods=['GET', 'POST'])
+def search_result():
+    query = request.form['query']
+    query = str(query)
+    if not query:
+        return render_template("nullpage.html")
     kv = sae.kvdb.Client()
-    dog_keys = kv.get('dogset')
-    cat_keys = kv.get('catset')
-    else_keys = kv.get_by_prefix('elsepetset')
+    data = kv.get_by_prefix('s')
+    #print data
     results = []
-    if query in [ value['pet-title'] for key,value in kv.get_multi(dog_keys)]:
-        results.append(key)
-    elif 
-
-
+    for key, value in data:
+        pet_item = [value['pet_title'], value['species'], value['location'],\
+            value['supplement'], value['date'], value['username']]
+        for item in pet_item:
+            if query in item:
+                print 6666666
+                results.append(key)
+                print results
+                print type(kv.get_multi(results).items())
+                images = [ value['photo_url']  for key,value in kv.get_multi(results).items()]
+                num = len(images)
+                pet_pages = ['/petpage/'+ key for key, value in kv.get_multi(results).items()]
+                pet_title = [ value['pet_title']  for key,value in kv.get_multi(results).items()]
+                pet_species = [ value['species']  for key,value in kv.get_multi(results).items()]
+                pet_location = [ value['location']  for key,value in kv.get_multi(results).items()]
+                pet_year = [ str(time.localtime(value['time']).tm_year)  for key,value in kv.get_multi(results).items()]
+                pet_mon = [ str(time.localtime(value['time']).tm_mon)  for key,value in kv.get_multi(results).items()]
+                pet_mday = [ str(time.localtime(value['time']).tm_mday)  for key,value in kv.get_multi(results).items()]
+                print 123            
+                return render_template("show_pet.html",images=images,pet_species=pet_species,
+                pet_pages = pet_pages,pet_title = pet_title, pet_location=pet_location, 
+                pet_year = pet_year, pet_mon=pet_mon,pet_mday=pet_mday,
+                num = num)
+            else:
+                print 456
+                return render_template("nullpage.html")
 
 
 @app.route('/signup', methods=['GET','POST'])
@@ -266,10 +202,8 @@ def sign_up():
             save_user(username, password, email)
             add_to_userset(username)
             message = '注册成功!'
-            flash('注册成功')
-            return redirect('/login')
         else:
-            message = '对不起,系统维护ing...'      
+            message = '对不起,系统维护ing...'   
     return render_template("signup.html", message = message)
 
 
@@ -323,7 +257,7 @@ def show(pet_species):
         pet_pages = pet_pages,pet_title = pet_title, pet_location=pet_location, 
         pet_year = pet_year, pet_mon=pet_mon,pet_mday=pet_mday,
         num = num)
-
+    
 
 @app.route('/petpage/<pet_id>')
 def show_post(pet_id):

@@ -5,9 +5,6 @@ import time
 from time import strftime, localtime
 
 
-
-
-
 def pets_number():
     """
         count the number of  the pets
@@ -59,7 +56,28 @@ def add_to_elsepetset(elsepetkey):
         kv.set('elsepetset', elsepets)
     kv.disconnect_all()
 
-def save_data(pet_title,species,location,tel,supplement, photo_url, user_id):
+def save_data(pet_title,species,location,tel, supplement, photo_url, user_id):
+    """
+    """
+    item_number = pets_number()
+    kv = sae.kvdb.Client()
+    if species == '狗狗':
+        key = str('s:d'+strftime("%y%m%d%H%M%S" , localtime()))
+    elif species == '猫猫':
+        key = str('s:c'+strftime("%y%m%d%H%M%S" , localtime()))
+    else:
+        key = str('s:e'+strftime("%y%m%d%H%M%S" , localtime()))
+    print key
+    now = time.time()
+    date = strftime("%Y/%m/%d" , localtime(now))
+    value = {'pet_title':pet_title, 'species': species,'location':location, 'username':user_id,
+        'tel':tel, 'supplement':supplement, 'photo_url':photo_url,'time':now, 'date':date}
+    kv.set(key, value)
+    kv.disconnect_all()
+    return key
+
+
+def _save_data(pet_title,species,location,tel,supplement, photo_url, user_id):
     """
         key is like this form: 151204112340 which is convenient
         to search according to datetime.
@@ -68,7 +86,7 @@ def save_data(pet_title,species,location,tel,supplement, photo_url, user_id):
     kv = sae.kvdb.Client()
     now = time.time()
     date = strftime("%Y/%m/%d", localtime(now))
-    key = str(user_id+strftime("%y%m%d%H%M%S" , localtime())
+    key = str(user_id+strftime("%y%m%d%H%M%S" , localtime()))
     value = {'pet_title':pet_title, 'species': species,'location':location, 
             'tel':tel, 'supplement':supplement, 'photo_url':photo_url,
             'time':now, 'date':date}
