@@ -3,6 +3,7 @@
 import sae.kvdb
 import time
 from time import strftime, localtime
+from sae.storage import Connection, Bucket
 
 
 def pets_number():
@@ -102,8 +103,12 @@ def _save_data(pet_title,species,location,tel,supplement, photo_url, user_id):
 
 def del_pet(pet_id):
     kv = sae.kvdb.Client()
+    image_url = kv.get(pet_id)['photo_url']
+    object_name = image_url.split('/')[-1]
     kv.delete(pet_id)
     number = kv.get('petsnumber') - 1
     kv.replace('petsnumber', number)
-
+    c = Connection()
+    bucket = c.get_bucket('images')
+    bucket.delete_object(object_name)
     kv.disconnect_all()
