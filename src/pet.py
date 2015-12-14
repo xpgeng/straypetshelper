@@ -99,3 +99,11 @@ def _save_data(pet_title,species,location,tel,supplement, photo_url, user_id):
         add_to_elsepetset(key)
     kv.disconnect_all()
     return key
+
+def del_pet(pet_id):
+    kv = sae.kvdb.Client()
+    kv.delete(pet_id)
+    number = kv.get('petsnumber') - 1
+    kv.replace('petsnumber', number)
+
+    kv.disconnect_all()
