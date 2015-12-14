@@ -76,6 +76,13 @@ def save_data(pet_title,species,location,tel, supplement, photo_url, user_id):
     kv.disconnect_all()
     return key
 
+def change_sequence(petlist):
+    import copy
+    petlist = copy.deepcopy(petlist)
+    petlist = sorted(petlist, key=lambda x:x[1]['time'], reverse=True)
+    return petlist
+
+
 
 def _save_data(pet_title,species,location,tel,supplement, photo_url, user_id):
     """

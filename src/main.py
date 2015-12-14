@@ -24,7 +24,7 @@ from sae.ext.storage import monkey
 from itsdangerous import URLSafeTimedSerializer
 from datetime import timedelta
 from fun_user import save_user, users_number, check_user, check_login, add_to_userset
-from pet import pets_number, save_data
+from pet import pets_number, save_data, change_sequence
 monkey.patch_all()
 
 #####################constant variables#######################
@@ -162,6 +162,7 @@ def search_result():
     if results:
         print type(kv.get_multi(results).items())
         pet_dict = kv.get_multi(results).items()
+        pet_dict = change_sequence(pet_dict)
         return render_template('show_dict.html', pet_dict=pet_dict)
     else:
         print 456
@@ -226,9 +227,9 @@ def show(pet_species):
         prefix = 's:'
     else:
         prefix = 's:e'
-
     keys = [key for key, value in kv.get_by_prefix(prefix)]
     pet_dict = kv.get_multi(keys).items()
+    pet_dict = change_sequence(pet_dict)
     return render_template('show_dict.html', pet_dict=pet_dict)
     
     
