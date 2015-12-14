@@ -24,7 +24,8 @@ from sae.ext.storage import monkey
 from itsdangerous import URLSafeTimedSerializer
 from datetime import timedelta
 from fun_user import save_user, users_number, check_user, check_login, add_to_userset
-from pet import pets_number, save_data, change_sequence
+from pet import pets_number, save_data, change_sequence, del_pet
+
 monkey.patch_all()
 
 #####################constant variables#######################
@@ -157,7 +158,6 @@ def search_result():
             value['supplement'], value['date'], value['username']]
         for item in pet_item:
             if query in str(item):
-                print 6666666
                 results.append(key)
     if results:
         print type(kv.get_multi(results).items())
@@ -247,7 +247,14 @@ def show_post(pet_id):
     kv.disconnect_all()
     return render_template("petpage.html",pet_title=pet_title,
             species=species, location=location, tel=tel, supplement=supplement,
-            image=image)
+            image=image, pet_id=pet_id)
+
+@app.route('/delete_pet', methods=['GET', 'POST'])
+def delete_pet():
+    pet_id = request.form['pet_id']
+    pet_id = str(pet_id)
+    del_pet(pet_id)
+    return redirect(url_for('show', pet_species = 'all'))
 
 
 @app.route('/about_us')
