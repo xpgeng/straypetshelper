@@ -23,9 +23,8 @@ from sae.storage import Connection, Bucket
 from sae.ext.storage import monkey
 from itsdangerous import URLSafeTimedSerializer
 from datetime import timedelta
-from user import save_user, users_number, check_user, check_login, add_to_userset
+from fun_user import save_user, users_number, check_user, check_login, add_to_userset
 from pet import pets_number, save_data
-import requests
 monkey.patch_all()
 
 #####################constant variables#######################
