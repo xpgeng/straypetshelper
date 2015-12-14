@@ -128,10 +128,12 @@ def show_all():
     return redirect(url_for('show', pet_species = 'all'))#user_id=user_id
 
 @app.route('/submit')
+@login_required
 def submit_pet():
     return render_template('index.html')
 
 @app.route('/submit', methods=['POST'])
+@login_required
 def checkin_pet():
     user_id = current_user.get_id()
     pet_title = request.form['pet-title']
@@ -276,7 +278,6 @@ def show_post(pet_id):
 
 
 @app.route('/about_us')
-@login_required
 def about_us():
     return render_template("us_about.html")
 
