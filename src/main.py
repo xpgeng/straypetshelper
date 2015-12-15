@@ -122,8 +122,10 @@ def show_all():
     return redirect(url_for('show', pet_species = 'all'))#user_id=user_id
 
 @app.route('/submit')
+@login_required
 def submit_pet():
-    return render_template('index.html')
+    user_id = current_user.get_id()
+    return render_template('index.html', username=user_id)
 
 @app.route('/submit', methods=['POST'])
 def checkin_pet():
@@ -140,7 +142,7 @@ def checkin_pet():
         renew_filename = process_filename(user_id, filename)
         photo_url = save_image_return_url(renew_filename, pet_photo)
     petkey = save_data(pet_title,species,location,tel,supplement, photo_url, user_id)
-    return redirect(url_for("show_post", pet_id=petkey))
+    return redirect(url_for("show_post", pet_id=petkey, username=user_id))
 
 
 @app.route('/search_result', methods=['GET', 'POST'])
@@ -181,13 +183,19 @@ def sign_up():
         print username, password, email, confirmpassword
         if check_user(username):
             message = '对不起, 您的用户名已经被注册.'
+            return render_template("signup.html", message = message)
         elif password == confirmpassword:
             save_user(username, password, email)
             add_to_userset(username)
             message = '注册成功!'
+            user = User.get(str(username))
+            login_user(user, remember=True)
+            return redirect(url_for('show', pet_species = 'all')) 
         else:
             message = '对不起,系统维护ing...'   
-    return render_template("signup.html", message = message)
+        return render_template("signup.html", message = message)
+    else:
+       return render_template("signup.html", message = message) 
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -200,24 +208,27 @@ def login():
         print username, password
         if not check_login(username,password):
             message = '用户名或密码不正确'
+            return render_template('login.html', message = message)
         else:
             login_user(user, remember=True)
             message = '登录成功!'
             #return redirect('/')
-    return render_template('login.html', message = message)
+            return redirect(url_for('show', pet_species = 'all'))
+    else:
+        return render_template('login.html', message = message)
 
 
-#@app.route('/logout/')
-#def logout_page():
-#    """
-#    Web Page to Logout User, then Redirect them to Index Page.
-#    """
-#    logout_user()
-#    return redirect('/')
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('show', pet_species = 'all'))
+
 
 
 @app.route('/show/<pet_species>', methods=['GET', 'POST'])
 def show(pet_species):
+    user_id = current_user.get_id()
     kv = sae.kvdb.Client()
     if pet_species == 'dog':
         prefix = 's:d'
@@ -230,7 +241,7 @@ def show(pet_species):
     keys = [key for key, value in kv.get_by_prefix(prefix)]
     pet_dict = kv.get_multi(keys).items()
     pet_dict = change_sequence(pet_dict)
-    return render_template('show_dict.html', pet_dict=pet_dict)
+    return render_template('show_dict.html', pet_dict=pet_dict, username=user_id)
     
     
 
@@ -259,7 +270,8 @@ def delete_pet():
 
 @app.route('/about_us')
 def about_us():
-    return render_template("us_about.html")
+    user_id = current_user.get_id()
+    return render_template("us_about.html", username=user_id)
 
 
 
