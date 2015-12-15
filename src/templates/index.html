@@ -68,8 +68,13 @@
             </form>
 
             <ul class="nav navbar-nav navbar-right">
+            {% if username == none %}
             <li><a href={{url_for('login')}}>登录</a></li>
-            <li><a href={{ url_for('sign_up') }}>注册</a></li>              
+            <li><a href={{ url_for('sign_up') }}>注册</a></li>
+            {% else %}
+            <li><a href=>{{username}}</a></li>
+            <li><a href={{ url_for('logout') }}>退出登录</a></li>
+            {% endif %}          
             </ul><!-- navbar-right -->
 
           </div><!-- navbar-->

@@ -8,13 +8,62 @@
 	<link rel="stylesheet" href="http://apps.bdimg.com/libs/bootstrap/3.3.0/css/bootstrap.min.css">	
 	<script src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script>
 	<script src="http://apps.bdimg.com/libs/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/masonry/3.3.2/masonry.pkgd.min.js"></script>
   
   <style>
         .jumbotron{
           margin: 0px;
           padding:0px;
         }
+
+        .pet{
+          padding: 0px;
+          border: none;
+          margin: 8px;
+          width: 23%;
+        }
+        .con1{
+          margin: 10px;
+          padding: 0px;
+        }
+        .photowall{
+          margin: 10px;
+          padding: 0px;
+        }
+
+        body{
+          background-color: #374140;
+        }
      
+@media only screen and (max-width : 999px),
+only screen and (max-device-width : 99px){
+  .pet {
+    width: 31%;
+  }
+}
+
+
+
+@media only screen and (max-width : 799px),
+only screen and (max-device-width : 799px){
+  .pet {
+    width: 350px;
+  }
+}
+
+@media only screen and (max-width : 599px),
+only screen and (max-device-width : 599px){
+  .pet {
+    width: 250px;
+  }
+}
+
+@media only screen and (max-width : 399px),
+only screen and (max-device-width : 399px){
+  .pet {
+    width: 170px;
+  }
+}
   </style>
 
 </head>
@@ -74,8 +123,13 @@
             </form>
 
             <ul class="nav navbar-nav navbar-right">
+            {% if username == none %}
             <li><a href={{url_for('login')}}>登录</a></li>
-            <li><a href={{ url_for('sign_up') }}>注册</a></li>              
+            <li><a href={{ url_for('sign_up') }}>注册</a></li>
+            {% else %}
+            <li><a href=>{{username}}</a></li>
+            <li><a href={{ url_for('logout') }}>退出登录</a></li>
+            {% endif %}             
             </ul><!-- navbar-right -->
 
           </div><!-- navbar-->
@@ -83,17 +137,18 @@
     </nav>    
 
 
-
-<div class="container">
+<div class="container con1">
+<div class="photowall js-masonry"
+  data-masonry-options='{ "itemSelector": ".pet" }'>
 
 {% for key, value in pet_dict %}
    
-  <div class="col-sm-3 col-md-3">
+  <!-- <div class="col-sm-3 col-md-3"> -->
   
-  <a href="/petpage/{{key}}" title="点击查看TA的详细信息">
-    <div class="thumbnail">
+  <!-- <a href="/petpage/{{key}}" title="点击查看TA的详细信息"> -->
+    <div class="pet thumbnail">
       
-      <img src="{{value['photo_url']}}" alt="your image", width="200">
+      <img src="{{value['photo_url']}}" alt="your image", width="300">
       
       <div class="caption">
 
@@ -105,15 +160,15 @@
         </p>
          </div>
          </div>
-         </a>
+         <!-- </a> -->
        
      
-    </div>
+    <!-- </div>  -->
 {% endfor %}
+  </div>
   </div>
 
 <!-- </div> -->
-
 
 </body>
 </html>
