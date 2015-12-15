@@ -170,6 +170,7 @@ def sign_up():
     message = None
     print request.method
     if request.method == 'POST':
+        username = request.form['username']
         password = request.form['password']
         email = request.form['email']
         confirmpassword = request.form['confirmpassword']
