@@ -32,7 +32,7 @@ def save_user(username, password, email):
     kv = sae.kvdb.Client()
     now = time.time()
     pwhash = generate_password_hash(password) #hash加密
-    message = {'username':username, 'password':pwhash, 'email':email, 'time':now}
+    message = {'username':username, 'password':pwhash, 'email':email, 'time':now,'pet':[]}
     kv.set(str(username), message)
     kv.disconnect_all()
 

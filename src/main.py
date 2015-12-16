@@ -13,6 +13,7 @@ import time
 from flask import Flask, request, render_template, url_for, \
        send_from_directory, flash, make_response, Response, redirect
 import hashlib 
+from time import strftime, localtime
 from werkzeug import secure_filename
 from werkzeug.security import generate_password_hash, \
         check_password_hash
@@ -29,7 +30,6 @@ monkey.patch_all()
 
 #####################constant variables#######################
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
-UNSIGNUP_USERNAME = set(['administrator', 'straypetshelper'])
 
 
 app = Flask(__name__)
@@ -83,8 +83,11 @@ def load_user(userid):
 @login_manager.token_loader
 def load_token(token):
     max_age = app.config["REMEMBER_COOKIE_DURATION"].total_seconds()
+
     data = login_serializer.loads(token, max_age=max_age)
+
     user = User.get(data[0])
+
     if user and data[1] == user.password:
         return user
     return None
@@ -96,7 +99,8 @@ def allowed_file(filename):
 
 def process_filename(user_id,filename):
     """
-        preprocess filename
+        This funcion can solve the bug of omitting the Chinese characters in filename.
+
     """
     filename_new = "%s%s.%s" % (user_id, int(time.time()), filename)
     return filename_new
@@ -125,10 +129,8 @@ def submit_pet():
 
 @app.route('/submit', methods=['POST'])
 def checkin_pet():
-    """
-    
-    """
     user_id = current_user.get_id()
+    print user_id
     pet_title = request.form['pet-title']
     species = request.form['species']
     location = request.form['location']
@@ -140,6 +142,12 @@ def checkin_pet():
         renew_filename = process_filename(user_id, filename)
         photo_url = save_image_return_url(renew_filename, pet_photo)
     petkey = save_data(pet_title,species,location,tel,supplement, photo_url, user_id)
+
+    kv = sae.kvdb.Client()
+    user_dic = kv.get(str(user_id))
+    user_dic['pet'].append(str(petkey))
+    kv.set(str(user_id),user_dic)
+    kv.disconnect_all()
     return redirect(url_for("show_post", pet_id=petkey, username=user_id))
 
 
@@ -147,6 +155,7 @@ def checkin_pet():
 def search_result():
     query = request.form['query']
     query = str(query)
+    print query
     if not query:
         return render_template("nullpage.html")
     kv = sae.kvdb.Client()
@@ -164,6 +173,7 @@ def search_result():
         pet_dict = change_sequence(pet_dict)
         return render_template('show_dict.html', pet_dict=pet_dict)
     else:
+        print 456
         return render_template("nullpage.html")
 
 
@@ -208,10 +218,10 @@ def login():
         else:
             login_user(user, remember=True)
             message = '登录成功!'
+            #return redirect('/')
             return redirect(url_for('show', pet_species = 'all'))
     else:
         return render_template('login.html', message = message)
-
 
 
 @app.route("/logout")
@@ -243,6 +253,7 @@ def show(pet_species):
 
 @app.route('/petpage/<pet_id>')
 def show_post(pet_id):
+    user_id = current_user.get_id()
     kv = sae.kvdb.Client()
     pet_id = str(pet_id)
     pet_title = kv.get(pet_id)['pet_title']
@@ -254,7 +265,7 @@ def show_post(pet_id):
     kv.disconnect_all()
     return render_template("petpage.html",pet_title=pet_title,
             species=species, location=location, tel=tel, supplement=supplement,
-            image=image, pet_id=pet_id)
+            image=image, pet_id=pet_id, username=user_id)
 
 @app.route('/delete_pet', methods=['GET', 'POST'])
 def delete_pet():
@@ -262,6 +273,24 @@ def delete_pet():
     pet_id = str(pet_id)
     del_pet(pet_id)
     return redirect(url_for('show', pet_species = 'all'))
+
+
+@app.route('/usercenter')
+@login_required
+def usercenter():
+    user_id = current_user.get_id()
+    kv = sae.kvdb.Client()
+    keys = kv.get(str(user_id))['pet']
+    if not keys:
+        message = "你还没有发布过小动物信息哦，快去发布吧～"
+    else:
+        message = "您发布过的小动物："
+        
+    pet_dict = kv.get_multi(keys).items()
+    pet_dict = change_sequence(pet_dict)
+    return render_template('user_page.html', message=message, 
+        pet_dict=pet_dict, username=user_id)
+
 
 
 @app.route('/about_us')
@@ -274,7 +303,7 @@ def about_us():
 @app.route('/wechat_auth', methods=['GET', 'POST'])
 def wechat_auth():  
     if request.method == 'GET':  
-        token = 'straypets' # your token  
+        token = 'xxxxxxxxxxx' # your token  
         query = request.args  # GET 方法附上的参数  
         signature = query.get('signature', '')  
         timestamp = query.get('timestamp', '')  
