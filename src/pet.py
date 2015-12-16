@@ -71,7 +71,7 @@ def save_data(pet_title,species,location,tel, supplement, photo_url, user_id):
     print key
     now = time.time()
     date = strftime("%Y/%m/%d" , localtime(now))
-    value = {'pet_title':pet_title, 'species': species,'location':location, 'username':user_id,
+    value = {'pet_title':pet_title, 'species': species,'location':location, 'email':user_id,
         'tel':tel, 'supplement':supplement, 'photo_url':photo_url,'time':now, 'date':date}
     kv.set(key, value)
     kv.disconnect_all()
