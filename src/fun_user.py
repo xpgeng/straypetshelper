@@ -25,37 +25,37 @@ def users_number():
 
 
 
-def save_user(username, password, email):
+def save_email(email, password, username):
     """
     """
     usersnumber = users_number()
     kv = sae.kvdb.Client()
     now = time.time()
     pwhash = generate_password_hash(password) #hash加密
-    message = {'username':username, 'password':pwhash, 'email':email, 'time':now,'pet':[]}
-    kv.set(str(username), message)
+    message = {'password':pwhash, 'email':email, 'username':username, 'time':now,'pet':[]}
+    kv.set(str(email), message)
     kv.disconnect_all()
 
-def add_to_userset(username):
+def add_to_emailset(email):
     kv = sae.kvdb.Client()
-    if kv.get('userset'):
-        users = kv.get('userset')
-        users.append(str(username))
-        kv.set ('userset',users)
+    if kv.get('emailset'):
+        emails = kv.get('emailset')
+        emails.append(str(email))
+        kv.set ('emailset',emails)
     else:
-        users = []
-        users.append(str(username))
-        kv.set('userset', users)
+        emails = []
+        emails.append(str(email))
+        kv.set('emailset', emails)
     kv.disconnect_all()
 
-def check_login(username,password):
+def check_login(email,password):
     """
     """
     kv = sae.kvdb.Client()
-    if not username:
+    if not email:
         return False
-    elif kv.get(str(username)):
-        pwhash = kv.get(str(username))['password']
+    elif kv.get(str(email)):
+        pwhash = kv.get(str(email))['password']
         if check_password_hash(pwhash, password):
             return True
         else:
@@ -64,9 +64,9 @@ def check_login(username,password):
         return False
     kv.disconnect_all()
 
-def check_user(username):
+def check_email(email):
     kv = sae.kvdb.Client()
-    if kv.get(str(username)):
+    if kv.get(str(email)):
         return True       
     else:
         return False        

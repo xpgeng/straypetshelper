@@ -23,7 +23,7 @@ from sae.storage import Connection, Bucket
 from sae.ext.storage import monkey
 from itsdangerous import URLSafeTimedSerializer
 from datetime import timedelta
-from fun_user import save_user, users_number, check_user, check_login, add_to_userset
+from fun_user import save_email, users_number, check_email, check_login, add_to_emailset
 from pet import pets_number, save_data, change_sequence, del_pet
 
 monkey.patch_all()
@@ -50,7 +50,6 @@ login_manager.init_app(app)
 class User(UserMixin):
     
     def __init__(self, userid, password):
-        #self.name = username
         self.id =userid 
         self.password = password
     
@@ -64,12 +63,12 @@ class User(UserMixin):
     @staticmethod
     def get(userid):
         kv = sae.kvdb.Client()
-        userset = kv.get('userset')
-        if userset:
-            for username in userset:
-                if username == userid:
-                    password = kv.get(str(username))['password']
-                    return User(username, password)
+        emailset = kv.get('emailset')
+        if emailset:
+            for email in emailset:
+                if email == userid:
+                    password = kv.get(str(email))['password']
+                    return User(email, password)
             kv = sae.kvdb.Client()
         else:
             return None
@@ -125,7 +124,7 @@ def submit_pet():
 
 @app.route('/submit', methods=['POST'])
 def checkin_pet():
-    user_id = current_user.get_id()
+    user_id = current_user.get_id()  #user_id is email
     pet_title = request.form['pet-title']
     species = request.form['species']
     location = request.form['location']
@@ -157,7 +156,7 @@ def search_result():
     results = []
     for key, value in data:
         pet_item = [value['pet_title'], value['species'], value['location'],\
-            value['supplement'], value['date'], value['username']]
+            value['supplement'], value['date'], value['email']]
         for item in pet_item:
             if query in str(item):
                 results.append(key)
@@ -176,18 +175,17 @@ def sign_up():
     print request.method
     if request.method == 'POST':
         username = request.form['username']
-        password = request.form['password']
         email = request.form['email']
+        password = request.form['password']
         confirmpassword = request.form['confirmpassword']
-        print username, password, email, confirmpassword
-        if check_user(username):
-            message = '对不起, 您的用户名已经被注册.'
+        if check_email(email):
+            message = '对不起, 您的Email已经被注册.'
             return render_template("signup.html", message = message)
         elif password == confirmpassword:
-            save_user(username, password, email)
-            add_to_userset(username)
+            save_email(email, password, username)
+            add_to_emailset(email)
             message = '注册成功!'
-            user = User.get(str(username))
+            user = User.get(str(email))
             login_user(user, remember=True)
             return redirect(url_for('show', pet_species = 'all')) 
         else:
@@ -201,11 +199,11 @@ def sign_up():
 def login():
     message = None
     if request.method == 'POST':
-        username = request.form['username']
+        email = request.form['email']
         password = request.form['password']
-        user = User.get(str(username))
-        print username, password
-        if not check_login(username,password):
+        user = User.get(str(email))
+        print email, password
+        if not check_login(email,password):
             message = '用户名或密码不正确'
             return render_template('login.html', message = message)
         else:
@@ -273,8 +271,7 @@ def usercenter():
     if not keys:
         message = "你还没有发布过小动物信息哦，快去发布吧～"
     else:
-        message = "您发布过的小动物："
-        
+        message = "您发布过的小动物："       
     pet_dict = kv.get_multi(keys).items()
     pet_dict = change_sequence(pet_dict)
     return render_template('user_page.html', message=message, 
