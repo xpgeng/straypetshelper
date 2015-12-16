@@ -81,6 +81,11 @@ only screen and (max-device-width : 399px){
     width: 170px;
   }
 }
+
+#message {
+  color: #F4F4F4
+}
+
   </style>
 
 </head>
@@ -153,7 +158,14 @@ only screen and (max-device-width : 399px){
         </div> <!-- container -->
     </nav>    
 
+<header>
+<h2 id="message">{{message}}</h2>
+</header>
 
+{% if not pet_dict %}
+<a href={{url_for('submit_pet')}}>点我发布动物信息</a>
+
+{% else %}
 <div class="container con1">
 <div class="photowall js-masonry"
   data-masonry-options='{ "itemSelector": ".pet" }'>
@@ -181,12 +193,10 @@ only screen and (max-device-width : 399px){
          </a>
        
      
-    <!-- </div>  -->
 {% endfor %}
-  </div>
-  </div>
-
-<!-- </div> -->
+  </div><!--photowall -->
+  </div><!--container-->
+{% endif %}
 
 </body>
 </html>
