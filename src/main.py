@@ -130,12 +130,17 @@ def checkin_pet():
     location = request.form['location']
     tel = request.form['tel']
     supplement = request.form['supplement']
-    pet_photo = request.files['petphoto']
-    if pet_photo and allowed_file(pet_photo.filename):
-        filename = secure_filename(pet_photo.filename)
-        renew_filename = process_filename(user_id, filename)
-        photo_url = save_image_return_url(renew_filename, pet_photo)
-    petkey = save_data(pet_title,species,location,tel,supplement, photo_url, user_id)
+# upload multiple files
+    pet_photo = request.files.getlist('petphoto')
+    photo_urls = []
+    for pfile in pet_photo:
+        if pfile and allowed_file(pfile.filename):
+            filename = secure_filename(pfile.filename)
+            renew_filename = process_filename(user_id, filename)
+            photo_url = save_image_return_url(renew_filename, pfile)
+            photo_urls.append(photo_url)
+
+    petkey = save_data(pet_title,species,location,tel,supplement, photo_urls, user_id)
 
     kv = sae.kvdb.Client()
     user_dic = kv.get(str(user_id))
@@ -254,7 +259,7 @@ def show_post(pet_id):
     kv.disconnect_all()
     return render_template("petpage.html",pet_title=pet_title,
             species=species, location=location, tel=tel, supplement=supplement,
-            image=image, pet_id=pet_id, username=user_id)
+            image=image, pet_id=pet_id, username=user_id,num_photo=len(image))
 
 @app.route('/delete_pet', methods=['GET', 'POST'])
 def delete_pet():

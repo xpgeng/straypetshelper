@@ -1,3 +1,4 @@
+
 {% extends "layout.html" %}
 {% block body %}  
 
@@ -19,12 +20,12 @@
 		        <input required type="text" class="form-control" id="pet-title" placeholder="输入您的标题" name="pet-title">
 	        </div>
         </div>
-        
+
+
         <div class="form-group">
 	    <label for="petphoto" class="col-sm-2 control-label">上传照片</label>
 	        <div class="col-sm-9">
-		   <input required type="file" id="petphoto" name="petphoto" onchange="readURL(this);">
-		<img src="#" id="blah" alt="your image">
+		   <input class="multi with-preview"  maxlength="5"  accept="gif|jpg|png|jpeg" type="file" id="petphoto" multiple="" name="petphoto" >
 		<p class="help-block" id="photo_help">选择您要上传的小动物照片，支持照片格式: png, jpg, jpeg, gif</p>
 	        </div>
         </div>
