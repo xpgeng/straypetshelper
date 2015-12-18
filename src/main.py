@@ -172,6 +172,7 @@ def search_result():
 @app.route('/signup', methods=['GET','POST'])
 def sign_up():
     message = None
+    user_id = current_user.get_id()
     print request.method
     if request.method == 'POST':
         username = request.form['username']
@@ -180,7 +181,7 @@ def sign_up():
         confirmpassword = request.form['confirmpassword']
         if check_email(email):
             message = '对不起, 您的Email已经被注册.'
-            return render_template("signup.html", message = message)
+            return render_template("signup.html", message = message, username=user_id)
         elif password == confirmpassword:
             save_email(email, password, username)
             add_to_emailset(email)
@@ -190,14 +191,15 @@ def sign_up():
             return redirect(url_for('show', pet_species = 'all')) 
         else:
             message = '对不起,系统维护ing...'   
-        return render_template("signup.html", message = message)
+        return render_template("signup.html", message = message, username=user_id)
     else:
-       return render_template("signup.html", message = message) 
+       return render_template("signup.html", message = message, username=user_id)
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     message = None
+    user_id = current_user.get_id()
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
@@ -211,7 +213,7 @@ def login():
             message = '登录成功!'
             return redirect(url_for('show', pet_species = 'all'))
     else:   
-        return render_template('login.html', message = message)
+        return render_template('login.html', message = message, username=user_id)
 
 @app.route("/logout")
 @login_required
