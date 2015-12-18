@@ -69,9 +69,50 @@
 
 <div class="container">
 <div class="col-sm-6 col-md-4">
-<div class="thumbnail">
-   <img src="{{image}}" alt="your image" width="400">
+{% if num_photo>1 %}
+<div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
+  <!-- Indicators -->
+
+  <ol class="carousel-indicators">
+  {% for i in range(num_photo) %}
+  {% if i == 0 %}
+  <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
+  {% else %}     
+  <li data-target="#carousel-example-generic" data-slide-to="{{i}}"></li>
+  {% endif %}
+  {% endfor %}  
+  </ol>
+
+  <!-- Wrapper for slides -->
+
+  <div class="carousel-inner" role="listbox">
+  {% for i in range(num_photo) %}
+  {% if i == 0 %}
+   <div class="item active">
+   {% else %}
+   <div class="item">
+   {% endif %}
+   <img src="{{image[i]}}" alt="the animal image">
+   </div>
+   {% endfor %}
+   
+  </div>
+
+  <!-- Controls -->
+  <a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
+    <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+    <span class="sr-only">Previous</span>
+  </a>
+  <a class="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next">
+    <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+    <span class="sr-only">Next</span>
+</a>
 </div>
+{% else %}
+<div class="thumbnail">
+   <img src="{{image[0]}}" alt="your image" width="400">
+</div>
+{% endif %}
 </div>
 
 <div class="col-sm-6 col-md-4">
@@ -93,9 +134,29 @@
 
 </div>
 
+
+
+
+
+
+<!-- 多说评论框 start -->
+  <div class="ds-thread" data-thread-key= "{{pet_id}}" data-title="{{pet_title}}" data-url="/petpage/{{pet_id}}"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"taketahome"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.unstable.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共JS代码 end -->
+
 </div>
-
-
 
 </body>
 </html>
