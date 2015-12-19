@@ -112,12 +112,21 @@ def _save_data(pet_title,species,location,tel,supplement, photo_url, user_id):
     return key
 
 def del_pet(pet_id):
+    from qiniu import BucketManager
+    from qiniu import Auth, put_data
+
+    access_key = "Yqbge2chl_b41gjy90cbK5WUQ8__mwiGuqGzomEG"
+    secret_key = "0dV_u7zaIoKkfksdF-4GiCh6UPHXVtr-SegekGll"
+    bucket_name = "straypetshelper"
+    q = Auth(access_key, secret_key)
+    bucket = BucketManager(q)
+
     kv = sae.kvdb.Client()
     image_urls = kv.get(pet_id)['photo_url']
-    c = Connection()
-    bucket = c.get_bucket('images')
     for image_url in image_urls:
-        bucket.delete_object(image_url.split('/')[-1])
+        key = image_url.split('/')[-1]
+        ret, info = bucket.delete(bucket_name, key)
+        
     kv.delete(pet_id)
     number = kv.get('petsnumber') - 1
     kv.replace('petsnumber', number)

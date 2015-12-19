@@ -8,6 +8,7 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 import os
+
 import sae.kvdb
 import time
 from flask import Flask, request, render_template, url_for, \
@@ -25,8 +26,16 @@ from itsdangerous import URLSafeTimedSerializer
 from datetime import timedelta
 from fun_user import save_email, users_number, check_email, check_login, add_to_emailset
 from pet import pets_number, save_data, change_sequence, del_pet
+from qiniu import Auth, put_data
+
 
 monkey.patch_all()
+access_key = "Yqbge2chl_b41gjy90cbK5WUQ8__mwiGuqGzomEG"
+secret_key = "0dV_u7zaIoKkfksdF-4GiCh6UPHXVtr-SegekGll"
+bucket_name = "straypetshelper"
+
+q = Auth(access_key, secret_key)
+
 
 #####################constant variables#######################
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
@@ -104,10 +113,11 @@ def save_image_return_url(filename, file):
     """ 
          return: the url of the image in the storage
     """
-    c = Connection()
-    bucket = c.get_bucket('images')
-    bucket.put_object(filename, file.read())
-    return bucket.generate_url(filename)
+    key = filename
+    token = q.upload_token(bucket_name, key)
+    ret, info = put_data(token,key,file.read())
+
+    return "http://7xpby0.com1.z0.glb.clouddn.com/"+filename
 
 
 
