@@ -26,7 +26,7 @@
    {% else %}
    <div class="item">
    {% endif %}
-   <img src="{{image[i]}}" alt="the animal image">
+   <img src="{{image[i] + '?imageView2/2/w/400'}}" alt="the animal image">
    </div>
    {% endfor %}
    
@@ -44,7 +44,7 @@
 </div>
 {% else %}
 <div class="thumbnail">
-   <img src="{{image[0]}}" alt="your image" width="400">
+   <img src="{{image[0] + '?imageView2/2/w/400'}}" alt="your image" width="400">
 </div>
 {% endif %}
 </div>
