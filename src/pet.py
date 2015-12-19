@@ -57,7 +57,8 @@ def add_to_elsepetset(elsepetkey):
         kv.set('elsepetset', elsepets)
     kv.disconnect_all()
 
-def save_data(pet_title,species,location,tel, supplement, photo_url, user_id):
+def save_data(pet_title, age, gender, sterilization, immunization, \
+        health, species,location,tel,supplement, photo_urls, user_id):
     """
     """
     item_number = pets_number()
@@ -71,8 +72,10 @@ def save_data(pet_title,species,location,tel, supplement, photo_url, user_id):
     print key
     now = time.time()
     date = strftime("%Y/%m/%d" , localtime(now))
-    value = {'pet_title':pet_title, 'species': species,'location':location, 'email':user_id,
-        'tel':tel, 'supplement':supplement, 'photo_url':photo_url,'time':now, 'date':date}
+    value = {'pet_title':pet_title, 'species': species, 'age': age, 'gender': gender,\
+    'sterilization': sterilization, 'immunization':immunization, 'health':health, \
+    'location':location, 'email':user_id,'tel':tel, 'supplement':supplement,\
+    'photo_urls':photo_urls,'time':now, 'date':date}
     kv.set(key, value)
     kv.disconnect_all()
     return key

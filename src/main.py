@@ -113,8 +113,7 @@ def save_image_return_url(filename, file):
 
 @app.route('/')
 def show_all():
-    #user_id = (current_user.get_id()) or None)
-    return redirect(url_for('show', pet_species = 'all'))#user_id=user_id
+    return redirect(url_for('show', pet_species = 'all'))
 
 @app.route('/submit')
 @login_required
@@ -126,12 +125,16 @@ def submit_pet():
 def checkin_pet():
     user_id = current_user.get_id()  #user_id is email
     pet_title = request.form['pet-title']
+    age = request.form['age']
+    gender = request.form['gender']
+    sterilization = request.form['sterilization']
+    immunization = request.form['immunization']
+    health = request.form['health']
     species = request.form['species']
     location = request.form['location']
     tel = request.form['tel']
     supplement = request.form['supplement']
-# upload multiple files
-    pet_photo = request.files.getlist('petphoto')
+    pet_photo = request.files.getlist('petphoto') # upload multiple files
     photo_urls = []
     for pfile in pet_photo:
         if pfile and allowed_file(pfile.filename):
@@ -140,7 +143,8 @@ def checkin_pet():
             photo_url = save_image_return_url(renew_filename, pfile)
             photo_urls.append(photo_url)
 
-    petkey = save_data(pet_title,species,location,tel,supplement, photo_urls, user_id)
+    petkey = save_data(pet_title, age, gender, sterilization, immunization, \
+        health, species,location,tel,supplement, photo_urls, user_id)
 
     kv = sae.kvdb.Client()
     user_dic = kv.get(str(user_id))
@@ -166,7 +170,6 @@ def search_result():
             if query in str(item):
                 results.append(key)
     if results:
-        print type(kv.get_multi(results).items())
         pet_dict = kv.get_multi(results).items()
         pet_dict = change_sequence(pet_dict)
         return render_template('show_dict.html', pet_dict=pet_dict)
@@ -253,16 +256,12 @@ def show_post(pet_id):
     user_id = current_user.get_id()
     kv = sae.kvdb.Client()
     pet_id = str(pet_id)
-    pet_title = kv.get(pet_id)['pet_title']
-    species = kv.get(pet_id)['species']
-    tel = kv.get(pet_id)['tel']
-    location = kv.get(pet_id)['location']
-    supplement = kv.get(pet_id)['supplement']
-    image = kv.get(pet_id)['photo_url']
+    image = kv.get(pet_id)['photo_urls']
+    pet_dict = kv.get(pet_id)
     kv.disconnect_all()
-    return render_template("petpage.html",pet_title=pet_title,
-            species=species, location=location, tel=tel, supplement=supplement,
-            image=image, pet_id=pet_id, username=user_id,num_photo=len(image))
+    return render_template("petpage.html", pet_id=pet_id, pet_dict=pet_dict, \
+        num_photo=len(image), image=image, username=user_id)
+
 
 @app.route('/delete_pet', methods=['GET', 'POST'])
 def delete_pet():
@@ -288,12 +287,10 @@ def usercenter():
         pet_dict=pet_dict, username=user_id)
 
 
-
 @app.route('/about_us')
 def about_us():
     user_id = current_user.get_id()
     return render_template("us_about.html", username=user_id)
-
 
 
 @app.route('/wechat_auth', methods=['GET', 'POST'])

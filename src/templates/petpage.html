@@ -49,32 +49,35 @@
 {% endif %}
 </div>
 
+
+
 <div class="col-sm-6 col-md-4">
-<h1>{{pet_title}}</h1>
+    <h1>{{pet_dict['pet_title']}}</h1>
 <p>
- <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span> {{location}}
+ <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span> {{pet_dict['location']}}
   </p>
      
-  <p>{{species}}</p>
+  <p>{{pet_dict['species']}}</p>
+  <p>年龄:{{pet_dict['age']}}</p>
+  <p>性别:{{pet_dict['gender']}}</p>
+  <p>是否绝育:{{pet_dict['sterilization']}}</p>
+  <p>是否免疫:{{pet_dict['immunization']}}</p>
+  <p>健康状况:{{pet_dict['health']}}</p>
+  <p>联系方式：{{pet_dict['tel']}}</p>
+  <p>备注：{{pet_dict['supplement']}}</p>
 
-  <p>联系方式：{{tel}}</p>
-
-  <p>备注：{{supplement}}</p>
  <wb:share-button appkey="2743619021" addition="simple" type="button" ralateUid="5792801747" default_text="我刚刚发布了一个流浪动物信息，快来围观吧，亲们，快来带它回家吧～"></wb:share-button>
 
  <form action={{url_for('delete_pet')}} method="POST">
   <button type="submit" class="btn btn-default" value="{{pet_id}}" name="pet_id"> <span class="glyphicon glyphicon-trash" aria-hidden="true"> </span></button>
 </form>
-
 </div>
 
 
 
 
-
-
 <!-- 多说评论框 start -->
-  <div class="ds-thread" data-thread-key= "{{pet_id}}" data-title="{{pet_title}}" data-url="/petpage/{{pet_id}}"></div>
+  <div class="ds-thread" data-thread-key= "{{pet_id}}" data-title="{{pet_dict['pet_title']}}" data-url="/petpage/{{pet_id}}"></div>
 <!-- 多说评论框 end -->
 <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
 <script type="text/javascript">
@@ -89,6 +92,7 @@ var duoshuoQuery = {short_name:"taketahome"};
   })();
   </script>
 <!-- 多说公共JS代码 end -->
+
 
 </div>
 
