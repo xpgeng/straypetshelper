@@ -42,6 +42,60 @@
         </div>
 
         <div class="form-group">
+	    <label for="species" class="col-sm-2 control-label">年龄</label>
+	        <div class="col-sm-9 dropdown">
+		        <select class="form-control" id="age" name="age">
+		            <option>0-6个月</option>
+		            <option>6-12个月</option>
+			        <option>1-2岁</option>
+			        <option>3-5岁</option>
+			        <option>6岁以上</option>
+			        <option>不详</option>
+		        </select>
+	        </div>
+        </div>
+
+        <div class="form-group">
+	    <label for="species" class="col-sm-2 control-label">性别</label>
+	        <div class="col-sm-9 dropdown">
+		        <select class="form-control" id="gender" name="gender">
+			        <option>雄性</option>
+			        <option>雌性</option>
+		        </select>
+	        </div>
+        </div>
+        
+        <div class="form-group">
+	    <label for="species" class="col-sm-2 control-label">是否绝育</label>
+	        <div class="col-sm-9 dropdown">
+		        <select class="form-control" id="sterilization" name="sterilization">
+			        <option>是</option>
+			        <option>否</option>
+			        <option>不详</option>
+		        </select>
+	        </div>
+        </div>
+
+        <div class="form-group">
+	    <label for="species" class="col-sm-2 control-label">是否免疫</label>
+	        <div class="col-sm-9 dropdown">
+		        <select class="form-control" id="immunization" name="immunization">
+			        <option>是</option>
+			        <option>否</option>
+			        <option>不详</option>
+		        </select>
+	        </div>
+        </div>
+
+        <div class="form-group">
+	    <label for="location" class="col-sm-2 control-label">健康状况</label>
+	        <div class="col-sm-9">
+		    <input required type="text" class="form-control" id="health" placeholder="详细介绍宠物的健康状况" name="health" >
+	        </div>
+        </div>
+
+
+        <div class="form-group">
 	    <label for="location" class="col-sm-2 control-label">位置</label>
 	        <div class="col-sm-9">
 		    <input required type="text" class="form-control" id="location" placeholder="输入您的位置：北京市 海淀区 ……" name="location" >
@@ -58,10 +112,9 @@
         <div class="form-group">
 	    <label for="supplement" class="col-sm-2 control-label">备注</label>
 	    <div class="col-sm-9">
-		    <input type="text" class="form-control" id="supplement" placeholder="其他信息：如小动物的描述、年龄、性别等" name="supplement">
+		    <input type="text" class="form-control" id="supplement" placeholder="" name="supplement">
 	    </div>
         </div>
-
 
         <div class="form-group">
 	        <div class="col-sm-offset-2 col-sm-9">
@@ -69,7 +122,7 @@
 	        </div>
         </div>
         </form>
-
+      
          <script  type="text/javascript">
  var frmvalidator = new Validator("myform");
  frmvalidator.addValidation("petphoto","req","上传照片才能让领养着更多地了解小动物哦，去上传吧：）");

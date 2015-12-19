@@ -49,6 +49,32 @@
     </script>
   
     <style>
+    html {
+      position: relative;
+      min-height: 100%;
+    }
+
+body{
+          background-color: #374140;
+          color: #FCFFF5;
+          margin-bottom: 40px;
+        }
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 40px;
+  background-color: #222222;
+  
+}
+
+footer p{
+    color: #FFFFFF;
+    margin: 13px 0;
+}
+
         .jumbotron{
           margin: 0px;
           padding:0px;
@@ -68,16 +94,14 @@
           margin: 10px;
           padding: 0px;
         }
+        
 
         a:hover{
             text-decoration: none;
         }
      
 
-        body{
-          background-color: #374140;
-          color: #FCFFF5
-        }
+        
      
         @media only screen and (max-width : 999px),
         only screen and (max-device-width : 99px){
@@ -112,6 +136,8 @@
         #message {
             color: #F4F4F4
         }
+
+
     </style>
 
 </head>
@@ -161,16 +187,17 @@
       </div> <!-- container -->
       </nav> 
 
+
 {% block body %}{% endblock %}
   
       
 <!-- Footer -->
-  <footer>
+  <footer class="footer">
     <div class="container">
       <p class="text-center">© 2015 - StrayPetsHelper</p>
     </div>
   </footer>
-  
+
   <!-- scripts -->
   <script src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script>
   <script src="http://apps.bdimg.com/libs/bootstrap/3.3.0/js/bootstrap.min.js"></script>
