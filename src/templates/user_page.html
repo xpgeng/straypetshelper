@@ -2,7 +2,9 @@
 {% block body %}  
 
 <header>
+<div class="container">
 <h2 id="message">{{message}}</h2>
+</div>
 </header>
 
 {% if not pet_dict %}
@@ -20,7 +22,7 @@
   <a href="/petpage/{{key}}" title="点击查看TA的详细信息"> 
     <div class="pet thumbnail">
       
-      <img src="{{value['photo_url'][0]}}" alt="your image", width="300">
+      <img src="{{value['photo_urls'][0]}}" alt="your image", width="300">
       
       <div class="caption">
 

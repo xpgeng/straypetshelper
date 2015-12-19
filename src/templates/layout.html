@@ -49,6 +49,37 @@
     </script>
   
     <style>
+    html {
+      position: relative;
+      min-height: 100%;
+    }
+
+body{
+          background-color: #FFFFFF;
+          color: #222222;
+          margin-bottom: 40px;
+        }
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 40px;
+  background-color: #222222;
+  
+}
+
+footer p{
+    color: #FFFFFF;
+    margin: 10px 0;
+}
+
+header h2 {
+margin-left: 20px;
+margin-top: 10px;
+}
+
         .jumbotron{
           margin: 0px;
           padding:0px;
@@ -56,7 +87,7 @@
 
         .pet{
           padding: 2px;
-          border: none;
+          border: 3px ridge #222222;
           margin: 8px;
           width: 23%;
         }
@@ -68,16 +99,14 @@
           margin: 10px;
           padding: 0px;
         }
+        
 
         a:hover{
             text-decoration: none;
         }
      
 
-        body{
-          background-color: #374140;
-          color: #FCFFF5
-        }
+        
      
         @media only screen and (max-width : 999px),
         only screen and (max-device-width : 99px){
@@ -110,8 +139,10 @@
         }
 
         #message {
-            color: #F4F4F4
+            color: #222222
         }
+
+
     </style>
 
 </head>
@@ -161,16 +192,17 @@
       </div> <!-- container -->
       </nav> 
 
+
 {% block body %}{% endblock %}
   
       
 <!-- Footer -->
-  <footer>
+  <footer class="footer">
     <div class="container">
       <p class="text-center">© 2015 - StrayPetsHelper</p>
     </div>
   </footer>
-  
+
   <!-- scripts -->
   <script src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script>
   <script src="http://apps.bdimg.com/libs/bootstrap/3.3.0/js/bootstrap.min.js"></script>
