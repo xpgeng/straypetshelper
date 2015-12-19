@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta property="wb:webmaster" content="8a344daabf5e2971" />
+	<title>带TA回家</title>
+	<link rel="stylesheet" href="http://apps.bdimg.com/libs/bootstrap/3.3.0/css/bootstrap.min.css">	
+	<script src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script src="http://apps.bdimg.com/libs/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+  
+  <style>
+        .jumbotron{
+          margin: 0px;
+          padding:0px;
+        }
+     
+  </style>
+
+</head>
+<body>
+
+<!-- <header class="site-header jumbotron">
+  <div class="container">
+    <div class="row">
+        <h1>带TA回家</h1>
+        <p>给流浪的它们一个 家 </p>
+
+    </div>
+  </div>
+</header> -->
+  
+
+    <nav class="navbar navbar-inverse" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+           
+              <a href={{url_for('show', pet_species = 'all')}} class="navbar-brand">带TA回家</a>
+          
+            </div>
+
+          <div id="bs-example-navbar-collapse-1" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+
+              {% if pet_species == 'dog' %}
+              <li><a href={{url_for('show', pet_species = 'cat')}}>流浪猫</a></li>
+              <li class="active"><a href={{url_for('show', pet_species = 'dog')}}>流浪狗</a></li>
+              {% elif pet_species == 'cat' %}
+               <li class="active"><a href={{url_for('show', pet_species = 'cat')}}>流浪猫</a></li>
+              <li><a href={{url_for('show', pet_species = 'dog')}}>流浪狗</a></li>
+              {% else %}
+              <li><a href={{url_for('show', pet_species = 'cat')}}>流浪猫</a></li>
+              <li><a href={{url_for('show', pet_species = 'dog')}}>流浪狗</a></li>
+              {% endif %}
+
+               <li><a href={{url_for('submit_pet')}}>发布</a></li>
+               <li><a href={{url_for('about_us')}}>关于我们</a></li>
+
+            </ul>
+
+            <form class="navbar-form navbar-left" role="search" action="{{url_for('search_result')}}" method="post">
+              <div class="input-group">
+              <input type="text" class="form-control" id="query" placeholder="输入您的关键词" name="query" value="{{ request.form.query}}">                
+              <span class="input-group-btn">
+              <button type="submit" class="btn btn-default"> <span class="glyphicon glyphicon-search" aria-hidden="true"> </span></button>
+              </span>
+              </div>
+            </form>
+
+            <ul class="nav navbar-nav navbar-right">
+            <li><a href={{url_for('login')}}>登录</a></li>
+            <li><a href={{ url_for('sign_up') }}>注册</a></li>              
+            </ul><!-- navbar-right -->
+
+          </div><!-- navbar-->
+        </div> <!-- container -->
+    </nav>    
+
+
+
+<div class="container">
+
+{% for i in range(num) %}
+
+  <div class="col-sm-3 col-md-3">
+  
+  <a href="{{pet_pages[i]}}" title="点击查看TA的详细信息">
+    <div class="thumbnail">
+      
+      <img src="{{images[i]}}" alt="your image", width="200">
+      
+      <div class="caption">
+
+        <h3>{{pet_title[i]}}</h3>
+        <p> 
+        <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span> {{pet_location[i]}}
+        <span class="glyphicon glyphicon-time" aria-hidden="true"></span> 
+        {{pet_year[i]+'/'+pet_mon[i]+'/'+pet_mday[i]}}
+        </p>
+         </div>
+         </div>
+         </a>
+       
+     
+    </div>
+{% endfor %}
+  </div>
+
+<!-- </div> -->
+
+
+</body>
+</html>
