@@ -19,7 +19,7 @@
         <div class="form-group">
 	    <label for="username" class="col-sm-2 control-label">用户名</label>
 	        <div class="col-sm-9">
-		        <input required type="text" class="form-control" id="username" placeholder="仅限大小写英文字母和数字"name="username" value="{{request.form.username }}">
+		        <input required type="text" class="form-control" id="username" placeholder="仅限大小写英文字母和数字"name="username" value="{{request.form.username }}" maxlength="20">
 	        </div>
         </div>
         
@@ -35,21 +35,21 @@
         <div class="form-group">
 	    <label for="location" class="col-sm-2 control-label">E-mail</label>
 	        <div class="col-sm-9">
-		    <input required type="email" class="form-control" id="email" placeholder="输入您的E-mail" name="email">
+		    <input required type="email" class="form-control" id="email" placeholder="输入您的E-mail" name="email" maxlength="30">
 	        </div>
         </div>
 
         <div class="form-group">
 	    <label for="contact" class="col-sm-2 control-label">密码</label>
 	        <div class="col-sm-9">
-		    <input required type="password" class="form-control" id="password" placeholder="至少6个字符" name="password">
+		    <input required type="password" class="form-control" id="password" placeholder="至少6个字符" name="password" maxlength="20">
             </div>
         </div>
 
         <div class="form-group">
 	    <label for="supplement" class="col-sm-2 control-label">确认密码</label>
 	    <div class="col-sm-9">
-		    <input required type="password" class="form-control" id="confirmpassword" placeholder="请确认您的密码" name="confirmpassword">
+		    <input required type="password" class="form-control" id="confirmpassword" placeholder="请确认您的密码" name="confirmpassword" maxlength="20">
 	    </div>
         </div>
 
