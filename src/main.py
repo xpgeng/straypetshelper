@@ -187,9 +187,12 @@ def sign_up():
         if check_email(email):
             message = '对不起, 您的Email已经被注册.'
             return render_template("signup.html", message = message, username=user_id)
+<<<<<<< HEAD
         elif len(password)<7 :
             message = '密码太短啦，再想一个长一点的吧：）'
             return render_template("signup.html", message = message, username=user_id)
+=======
+>>>>>>> master
         elif password == confirmpassword:
             save_email(email, password, username)
             add_to_emailset(email)
@@ -198,7 +201,11 @@ def sign_up():
             login_user(user, remember=True)
             return redirect(url_for('show', pet_species = 'all')) 
         else:
+<<<<<<< HEAD
             message = '确认密码和密码不一致，重新输入吧：）'   
+=======
+            message = '对不起,系统维护ing...'   
+>>>>>>> master
         return render_template("signup.html", message = message, username=user_id)
     else:
        return render_template("signup.html", message = message, username=user_id)
