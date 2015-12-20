@@ -191,19 +191,18 @@ def search_results(query):
 
 def check_message(message):
     kv = sae.kvdb.Client()
-    print message[0:4]
-    if message[0:2] == 'd.':
+    if message[0:1] == 'd.':
         key = message[2:]
         content = kv.get(key)
         kv.delete(key)
         return  "%s\n This item has beem deleted." %content
-    elif message[0:3] == 'dp.':
+    elif message[0:2] == 'dp.':
         prefix = message[3:]
         keys = kv.getkeys_by_prefix(prefix)
         for key in keys:
             kv.delete(key)
         return "%s\n All the keys' item have been deleted." %keys
-    elif message == 'bakckup':
+    elif message == 'backup':
         bucket = Bucket('backup')
         bucket.put()
         data_dict = dict(kv.get_by_prefix(''))
