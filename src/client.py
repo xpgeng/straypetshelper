@@ -3,6 +3,13 @@
 """
 Project: SPH
 Author: Shenlang
+
+
+
+注意: 使用时记得修改链接. ;-)
+
+
+
 """
 
 import sys,requests
