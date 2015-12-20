@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import time
 from werkzeug import secure_filename
 from qiniu import Auth, put_data
