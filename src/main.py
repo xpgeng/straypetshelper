@@ -10,7 +10,7 @@ sys.setdefaultencoding('utf-8')
 
 import sae.kvdb
 from flask import Flask, request, render_template, url_for, redirect
-from flask import send_from_directory, flash, make_response, Response, 
+from flask import send_from_directory, flash, make_response, Response 
 from flask.ext.login import LoginManager, UserMixin, login_required
 from flask.ext.login import login_user, current_user, logout_user
 from itsdangerous import URLSafeTimedSerializer
