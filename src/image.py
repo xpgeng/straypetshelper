@@ -31,6 +31,13 @@ def save_image_return_url(filename, file):
 
     return "http://7xpby0.com1.z0.glb.clouddn.com/"+filename
 
+def save_image_return_url_sae(filename, file):
+    from sae.storage import Connection, Bucket
+    c = Connection()
+    bucket = c.get_bucket('images')
+    bucket.put_object(filename, file.read())
+    return bucket.generate_url(filename)
+
 
 def get_photourls(user_id, pet_photo):
     photo_urls = []
@@ -38,8 +45,11 @@ def get_photourls(user_id, pet_photo):
         if pfile and allowed_file(pfile.filename):
             filename = secure_filename(pfile.filename)
             renew_filename = process_filename(user_id, filename)
-            photo_url = save_image_return_url(renew_filename, pfile)
+            #photo_url = save_image_return_url(renew_filename, pfile)
+            photo_url = save_image_return_url_sae(renew_filename, pfile)
             photo_urls.append(photo_url)
         #else:
         	#return    # havn't finished 
     return photo_urls
+
+

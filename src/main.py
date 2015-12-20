@@ -16,10 +16,11 @@ from flask.ext.login import LoginManager, UserMixin, login_required, \
 from itsdangerous import URLSafeTimedSerializer
 from datetime import timedelta
 from fun_user import save_email, users_number, check_email, check_login, add_to_emailset,\
-                get_message_petdict_from_userid, User
+                get_message_petdict_from_userid
 from pet import pets_number, save_data, change_sequence, del_pet, get_petdict_according_petspecies, \
-                add_petkey_to_userId, get_image_and_petdict, search_results
+                add_petkey_to_userId, get_image_and_petdict, search_results, check_message
 from image import allowed_file, process_filename, save_image_return_url, get_photourls
+import requests
 from sae.ext.storage import monkey
 monkey.patch_all()
 
@@ -229,6 +230,15 @@ def usercenter():
 def about_us():
     user_id = current_user.get_id()
     return render_template("us_about.html", username=user_id)
+
+
+@app.route('/client', methods=['GET','POST'])
+def client():
+    message = request.form['data']
+    print message
+    print check_message(message)
+    return check_message(message)
+
 
 
 @app.route('/wechat_auth', methods=['GET', 'POST'])
