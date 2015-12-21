@@ -2,44 +2,36 @@
 """
 Project: Stray Pets Helper
 Author: Shenlang
+        Huijuannan
 """
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-import os
-
 import sae.kvdb
-import time
-from flask import Flask, request, render_template, url_for, \
-       send_from_directory, flash, make_response, Response, redirect
-import hashlib 
-from time import strftime, localtime
-from werkzeug import secure_filename
-from werkzeug.security import generate_password_hash, \
-        check_password_hash
-from flask.ext.login import LoginManager, UserMixin, login_required, \
- login_user, current_user, logout_user
-from sae.storage import Connection, Bucket
-from sae.ext.storage import monkey
+from flask import Flask, request, render_template, url_for, redirect
+from flask import send_from_directory, flash, make_response, Response 
+from flask.ext.login import LoginManager, UserMixin, login_required
+from flask.ext.login import login_user, current_user, logout_user
 from itsdangerous import URLSafeTimedSerializer
 from datetime import timedelta
-from fun_user import save_email, users_number, check_email, check_login, add_to_emailset
-from pet import pets_number, save_data, change_sequence, del_pet
-from qiniu import Auth, put_data
+from fun_user import save_email, users_number, check_email, check_login
+from fun_user import add_to_emailset,get_message_petdict_from_userid
+from pet import pets_number, save_data, change_sequence, del_pet 
+from pet import get_petdict_according_petspecies, add_petkey_to_userId
+from pet import get_image_and_petdict, search_results, check_message
+from image import allowed_file, process_filename, save_image_return_url,\
+                 get_photourls
+import requests
+from sae.ext.storage import monkey
 from flask.ext.mail import Mail, Message
 
-
 monkey.patch_all()
-access_key = "Yqbge2chl_b41gjy90cbK5WUQ8__mwiGuqGzomEG"
-secret_key = "0dV_u7zaIoKkfksdF-4GiCh6UPHXVtr-SegekGll"
-bucket_name = "straypetshelper"
-
-q = Auth(access_key, secret_key)
 
 
-#####################constant variables#######################
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
+################################
+###### constant variables ######
+################################
 UNSIGNUP_USERNAME = set(['administrator', 'straypetshelper'])
 
 app = Flask(__name__)
@@ -92,9 +84,9 @@ class User(UserMixin):
                 if email == userid:
                     password = kv.get(str(email))['password']
                     return User(email, password)
-            kv = sae.kvdb.Client()
         else:
             return None
+        kv.disconnect_all()
 
 
 @login_manager.user_loader
@@ -112,32 +104,10 @@ def load_token(token):
     return None
 
 
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
-
-
-def process_filename(user_id,filename):
-    """
-          preprocess filename
-    """
-    filename_new = "%s%s.%s" % (user_id, int(time.time()), filename)
-    return filename_new
-
-def save_image_return_url(filename, file):
-    """ 
-         return: the url of the image in the storage
-    """
-    key = filename
-    token = q.upload_token(bucket_name, key)
-    ret, info = put_data(token,key,file.read())
-
-    return "http://7xpby0.com1.z0.glb.clouddn.com/"+filename
-
-
-
 @app.route('/')
 def show_all():
     return redirect(url_for('show', pet_species = 'all'))
+
 
 @app.route('/submit')
 @login_required
@@ -145,36 +115,28 @@ def submit_pet():
     user_id = current_user.get_id()
     return render_template('index.html', username=user_id)
 
+
 @app.route('/submit', methods=['POST'])
 def checkin_pet():
     user_id = current_user.get_id()  #user_id is email
     pet_title = request.form['pet-title']
     age = request.form['age']
     gender = request.form['gender']
-    sterilization = request.form['sterilization']
-    immunization = request.form['immunization']
+    sterilization = request.form['sterilization'] 
+    immunization = request.form['immunization'] 
     health = request.form['health']
     species = request.form['species']
     location = request.form['location']
     tel = request.form['tel']
     supplement = request.form['supplement']
     pet_photo = request.files.getlist('petphoto') # upload multiple files
-    photo_urls = []
-    for pfile in pet_photo:
-        if pfile and allowed_file(pfile.filename):
-            filename = secure_filename(pfile.filename)
-            renew_filename = process_filename(user_id, filename)
-            photo_url = save_image_return_url(renew_filename, pfile)
-            photo_urls.append(photo_url)
+
+    photo_urls = get_photourls(user_id, pet_photo)
 
     petkey = save_data(pet_title, age, gender, sterilization, immunization, \
         health, species,location,tel,supplement, photo_urls, user_id)
 
-    kv = sae.kvdb.Client()
-    user_dic = kv.get(str(user_id))
-    user_dic['pet'].append(str(petkey))
-    kv.set(str(user_id),user_dic)
-    kv.disconnect_all()
+    add_petkey_to_userId( user_id, petkey)
     return redirect(url_for("show_post", pet_id=petkey, username=user_id))
 
 
@@ -184,18 +146,8 @@ def search_result():
     query = str(query)
     if not query:
         return render_template("nullpage.html")
-    kv = sae.kvdb.Client()
-    data = kv.get_by_prefix('s')
-    results = []
-    for key, value in data:
-        pet_item = [value['pet_title'], value['species'], value['location'],\
-            value['supplement'], value['date'], value['email']]
-        for item in pet_item:
-            if query in str(item):
-                results.append(key)
-    if results:
-        pet_dict = kv.get_multi(results).items()
-        pet_dict = change_sequence(pet_dict)
+    pet_dict = search_results(query)
+    if pet_dict:
         return render_template('show_dict.html', pet_dict=pet_dict)
     else:
         return render_template("nullpage.html")
@@ -214,8 +166,8 @@ def sign_up():
         if check_email(email):
             message = '对不起, 您的Email已经被注册.'
             return render_template("signup.html", message = message, username=user_id)
-        elif len(password)<7 :
-            message = '密码太短啦，再想一个长一点的吧：）'
+        elif len(password)<6 :
+            message = '密码太短啦，再想一个长一点的吧:-）'
             return render_template("signup.html", message = message, username=user_id)
         elif password == confirmpassword:
             save_email(email, password, username)
@@ -225,7 +177,7 @@ def sign_up():
             login_user(user, remember=True)
             return redirect(url_for('show', pet_species = 'all')) 
         else:
-            message = '确认密码和密码不一致，重新输入吧：）'   
+            message = '确认密码和密码不一致，重新输入吧:-）'   
         return render_template("signup.html", message = message, username=user_id)
     else:
        return render_template("signup.html", message = message, username=user_id)
@@ -239,7 +191,6 @@ def login():
         email = request.form['email']
         password = request.form['password']
         user = User.get(str(email))
-        print email, password
         if not check_login(email,password):
             message = '用户名或密码不正确'
             return render_template('login.html', message = message)
@@ -250,48 +201,37 @@ def login():
     else:   
         return render_template('login.html', message = message, username=user_id)
 
+
 @app.route("/logout")
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('show', pet_species = 'all'))
 
+
 @app.route('/show/<pet_species>', methods=['GET', 'POST'])
 def show(pet_species):
     user_id = current_user.get_id()
-    kv = sae.kvdb.Client()
-    if pet_species == 'dog':
-        prefix = 's:d'
-    elif pet_species == 'cat':
-        prefix = 's:c'
-    elif pet_species == 'all':
-        prefix = 's:'
-    else:
-        prefix = 's:e'
-    keys = [key for key, value in kv.get_by_prefix(prefix)]
-    pet_dict = kv.get_multi(keys).items()
+    pet_dict = get_petdict_according_petspecies(pet_species)
     pet_dict = change_sequence(pet_dict)
     return render_template('show_dict.html', pet_dict=pet_dict, username=user_id)
-    
-    
+       
 
 @app.route('/petpage/<pet_id>')
 def show_post(pet_id):
     user_id = current_user.get_id()
-    kv = sae.kvdb.Client()
-    pet_id = str(pet_id)
-    image = kv.get(pet_id)['photo_urls']
-    pet_dict = kv.get(pet_id)
-    kv.disconnect_all()
+    image, pet_dict = get_image_and_petdict(pet_id) 
     return render_template("petpage.html", pet_id=pet_id, pet_dict=pet_dict, \
         num_photo=len(image), image=image, username=user_id)
 
 
 @app.route('/delete_pet', methods=['GET', 'POST'])
 def delete_pet():
+    user_id = current_user.get_id()
     pet_id = request.form['pet_id']
     pet_id = str(pet_id)
-    del_pet(pet_id)
+    user_id = str(user_id)
+    del_pet(pet_id, user_id)
     return redirect(url_for('usercenter'))
 
 
@@ -299,13 +239,7 @@ def delete_pet():
 @login_required
 def usercenter():
     user_id = current_user.get_id()
-    kv = sae.kvdb.Client()
-    keys = kv.get(str(user_id))['pet']
-    if not keys:
-        message = "你还没有发布过小动物信息哦，快去发布吧～"
-    else:
-        message = "您发布过的小动物："       
-    pet_dict = kv.get_multi(keys).items()
+    message, pet_dict = get_message_petdict_from_userid(user_id)
     pet_dict = change_sequence(pet_dict)
     return render_template('user_page.html', message=message, 
         pet_dict=pet_dict, username=user_id)
@@ -325,6 +259,15 @@ def find_pw():
     msg.body = "This is the email body"
     mail.send(msg)
     return "Sent"
+
+
+
+@app.route('/client', methods=['GET','POST'])
+def client():
+    message = request.form['data']
+    print message
+    print check_message(message)
+    return check_message(message)
 
 
 

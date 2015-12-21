@@ -9,6 +9,8 @@ from datetime import timedelta
 from werkzeug.security import generate_password_hash, \
         check_password_hash
 
+
+
 def users_number():
     """
         count the number of  the pets
@@ -70,4 +72,15 @@ def check_email(email):
         return True       
     else:
         return False        
+    kv.disconnect_all()
+
+def get_message_petdict_from_userid(user_id):
+    kv = sae.kvdb.Client()
+    keys = kv.get(str(user_id))['pet']
+    if not keys:
+        message = "你还没有发布过小动物信息哦，快去发布吧～"
+    else:
+        message = "您发布过的小动物："       
+    pet_dict = kv.get_multi(keys).items()
+    return message, pet_dict
     kv.disconnect_all()
