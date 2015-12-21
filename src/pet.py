@@ -139,14 +139,10 @@ def del_pet(pet_id, user_id):
 
 def add_petkey_to_userId( user_id, petkey):
     kv = sae.kvdb.Client()
-    if kv.get(str(user_id)):
-        user_dic = kv.get(str(user_id))
-        user_dic['pet'].append(str(petkey))
-        kv.set(str(user_id),user_dic)
-    else:
-        use_dic = {}
-        user_dic['pet'] = [str(petkey)]
-        kv.set(str(user_id),user_dic)
+    kv.get(str(user_id)):
+    user_dic = kv.get(str(user_id))
+    user_dic['pet'].append(str(petkey))
+    kv.set(str(user_id),user_dic)
     kv.disconnect_all()
 
 def get_petdict_according_petspecies(pet_species):
