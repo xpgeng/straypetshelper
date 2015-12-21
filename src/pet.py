@@ -195,76 +195,46 @@ def search_results(query):
 
 def check_message(message):
     kv = sae.kvdb.Client()
-    if message[0:2] == 'd.':
-        key = str(message[2:])
-        content = kv.get(key)
-        kv.delete(key)
-        return  "%s\n This item has beem deleted." %content
-    elif message[0:3] == 'dp.':
-        prefix =str(message[3:])
-        keys = kv.getkeys_by_prefix(prefix)
-        for key in keys:
-            kv.delete(key)
-        return "%s\n All the keys' item have been deleted." %keys
-    elif message == 'backup':
+    if message == 'backup':
         bucket = Bucket('backup')
         bucket.put()
         data_dict = dict(kv.get_by_prefix(''))
         data_dict = json.dumps(data_dict)
         bucket.put_object('database.json', data_dict)
         return "备份成功!"
-    elif message[0:4] == 'get.':
-        prefix = str(message[4:])
-        content = dict(kv.get_by_prefix(prefix))
-        return '''They are:
-               %s
-               '''% content
     elif message == 'ca':
         keys = kv.getkeys_by_prefix('')
         for key in keys:
             kv.delete(key)
         return "Database is empty!"
+    elif '.' in message:
+        funs, values = message.split('.',1)
+        if funs == 'd':
+            key = values
+            content = kv.get(key)
+            kv.delete(key)
+            return  "%s\n This item has beem deleted." %content
+        elif funs == 'dp':
+            prefix = values
+            keys = kv.getkeys_by_prefix(prefix)
+            for key in keys:
+                kv.delete(key)
+            return "%s\n All the keys' item have been deleted." %keys
+        elif funs == 'get':
+            prefix = values
+            content = dict(kv.get_by_prefix(prefix))
+            return '''They are:
+               %s
+               '''% content
+        elif funs == 'du':
+            user_email = str(values)
+            kv.delete(user_email)
+            emails = kv.get('emailset')
+            emails = [x for x in emails if not x == user_email]
+            kv.set ('emailset',emails)
+            number = kv.get('usersnumber') - 1
+            kv.replace('usersnumber', number)
+            return """用户%s已经删除"""%user_email
     else:
         return "Sorry, Please check your input..."
     kv.disconnect_all()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    

@@ -25,6 +25,7 @@ def main():
          backup: 数据库备份
          get.prefix: 查看该前缀的所有数据
          ca: 清空数据库. 慎用!!
+         du.email: 删除该email对应的用户
          help or h or H: 帮助
          '''
     print help_message
