@@ -22,7 +22,6 @@ from pet import get_petdict_according_petspecies, add_petkey_to_userId
 from pet import get_image_and_petdict, search_results, check_message
 from image import allowed_file, process_filename, save_image_return_url,\
                  get_photourls
-import requests
 from sae.ext.storage import monkey
 from flask.ext.mail import Mail, Message
 
