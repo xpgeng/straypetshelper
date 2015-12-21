@@ -30,6 +30,12 @@
         <ul class="list-inline">
         <li><span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span> {{value['location']}}</li>
         <li><span class="glyphicon glyphicon-time text-right" aria-hidden="true"></span> {{value['date']}}</li>
+        <li> 
+        <form action={{url_for('delete_pet')}} method="POST">
+        <button type="submit" class="btn btn-default" value="{{key}}" name="pet_id"> <span class="glyphicon glyphicon-trash" aria-hidden="true"> </span>
+        </button>
+        </form>
+        </li>
         </ul>
 
         

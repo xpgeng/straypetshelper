@@ -24,6 +24,8 @@ from image import allowed_file, process_filename, save_image_return_url,\
                  get_photourls
 import requests
 from sae.ext.storage import monkey
+from flask.ext.mail import Mail, Message
+
 monkey.patch_all()
 
 
@@ -37,6 +39,19 @@ app.debug = True
 app.secret_key = "a_random_secret_key_$%#!@"
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config["REMEMBER_COOKIE_DURATION"] = timedelta(days=14)
+
+mail=Mail(app)
+
+app.config.update(
+    #EMAIL SETTINGS
+    MAIL_SERVER='smtp.sina.com',
+    MAIL_PORT=25,
+    MAIL_USE_SSL=False,
+    MAIL_USERNAME = 'straypetshelper@sina.com',
+    MAIL_PASSWORD = 'dashener@py'
+    )
+
+mail=Mail(app)
 
 login_serializer = URLSafeTimedSerializer(app.secret_key)
 ###########################
@@ -215,7 +230,7 @@ def delete_pet():
     pet_id = request.form['pet_id']
     pet_id = str(pet_id)
     del_pet(pet_id)
-    return redirect(url_for('show', pet_species = 'all'))
+    return redirect(url_for('usercenter'))
 
 
 @app.route('/usercenter')
@@ -232,6 +247,17 @@ def usercenter():
 def about_us():
     user_id = current_user.get_id()
     return render_template("us_about.html", username=user_id)
+
+@app.route('/find_pw')
+def find_pw():
+    msg = Message(
+              'Hello',
+           sender='straypetshelper@sina.com',
+           recipients=['huijuannan.p@gmail.com'])
+    msg.body = "This is the email body"
+    mail.send(msg)
+    return "Sent"
+
 
 
 @app.route('/client', methods=['GET','POST'])
