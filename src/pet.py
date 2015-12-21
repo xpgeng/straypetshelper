@@ -122,7 +122,7 @@ def del_pet(pet_id):
     bucket = BucketManager(q)
 
     kv = sae.kvdb.Client()
-    image_urls = kv.get(pet_id)['photo_url']
+    image_urls = kv.get(pet_id)['photo_urls']
     for image_url in image_urls:
         key = image_url.split('/')[-1]
         ret, info = bucket.delete(bucket_name, key)

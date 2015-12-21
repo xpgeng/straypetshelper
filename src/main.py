@@ -27,6 +27,7 @@ from datetime import timedelta
 from fun_user import save_email, users_number, check_email, check_login, add_to_emailset
 from pet import pets_number, save_data, change_sequence, del_pet
 from qiniu import Auth, put_data
+from flask.ext.mail import Mail, Message
 
 
 monkey.patch_all()
@@ -46,6 +47,19 @@ app.debug = True
 app.secret_key = "a_random_secret_key_$%#!@"
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config["REMEMBER_COOKIE_DURATION"] = timedelta(days=14)
+
+mail=Mail(app)
+
+app.config.update(
+    #EMAIL SETTINGS
+    MAIL_SERVER='smtp.sina.com',
+    MAIL_PORT=25,
+    MAIL_USE_SSL=False,
+    MAIL_USERNAME = 'straypetshelper@sina.com',
+    MAIL_PASSWORD = 'dashener@py'
+    )
+
+mail=Mail(app)
 
 login_serializer = URLSafeTimedSerializer(app.secret_key)
 ###########################
@@ -278,7 +292,7 @@ def delete_pet():
     pet_id = request.form['pet_id']
     pet_id = str(pet_id)
     del_pet(pet_id)
-    return redirect(url_for('show', pet_species = 'all'))
+    return redirect(url_for('usercenter'))
 
 
 @app.route('/usercenter')
@@ -301,6 +315,17 @@ def usercenter():
 def about_us():
     user_id = current_user.get_id()
     return render_template("us_about.html", username=user_id)
+
+@app.route('/find_pw')
+def find_pw():
+    msg = Message(
+              'Hello',
+           sender='straypetshelper@sina.com',
+           recipients=['huijuannan.p@gmail.com'])
+    msg.body = "This is the email body"
+    mail.send(msg)
+    return "Sent"
+
 
 
 @app.route('/wechat_auth', methods=['GET', 'POST'])
