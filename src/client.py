@@ -19,14 +19,14 @@ sys.setdefaultencoding('utf-8')
 
 def main():
     help_message = '''Hello. 
-         你要干啥???
-         d.key: 删除该key对应的数据
-         dp.key_prefix: 删除此前缀的所有数据  
-         backup: 数据库备份
-         get.prefix: 查看该前缀的所有数据
-         ca: 清空数据库. 慎用!!
-         help or h or H: 帮助
-         '''
+        你要干啥???
+        d.key: 删除该key对应的数据
+        dp.key_prefix: 删除此前缀的所有数据  
+        backup: 数据库备份
+        get.prefix: 查看该前缀的所有数据
+        ca: 清空数据库. 慎用!!
+        help or h or H: 帮助
+        '''
     print help_message
     while True:  
         data = raw_input('> ')
