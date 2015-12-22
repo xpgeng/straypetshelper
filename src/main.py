@@ -108,7 +108,7 @@ def send_email(recp_list, msg_title, msg_body):
               str(msg_title),
            sender='straypetshelper@sina.com',
            recipients=recp_list)
-    msg.body = msg_body
+    msg.html = msg_body
     mail.send(msg)
     return "Sent"
 
@@ -187,7 +187,7 @@ def sign_up():
             login_user(user, remember=True)
             msg_title = "欢迎注册 带TA回家"
             msg_body = "亲爱的%s, 您好\n\n\t 欢迎您注册带TA回家。\n\t如果有任何的建议，请直接回复邮件。\n\n\t谢谢！"%username
-            send_email([str(email)], msg_title, msg_body)
+            # send_email([str(email)], msg_title, msg_body)
             return redirect(url_for('show', pet_species = 'all')) 
         else:
             message = '确认密码和密码不一致，重新输入吧:-）'   
@@ -271,7 +271,7 @@ def reset():
 
             msg_body = render_template('email_reset.html', recover_url=recover_url)
             send_email([str(email)], msg_title, msg_body)
-            message = """已经向你的邮箱 %s发送了一封邮件<br>，请根据其中的指示操作。<br>
+            message = """已经向你的邮箱 %s发送了一封邮件，请根据其中的指示操作。
                 （提示：邮件可能会被识别为垃圾邮件）""" % email
         else:
             message = "此邮箱没有注册，请重新输入或者注册"
