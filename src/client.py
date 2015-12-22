@@ -19,6 +19,7 @@ sys.setdefaultencoding('utf-8')
 
 def main():
     help_message = '''Hello. 
+
          你要干啥???
          d.key: 删除该key对应的数据
          dp.key_prefix: 删除此前缀的所有数据  

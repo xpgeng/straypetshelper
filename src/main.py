@@ -16,13 +16,13 @@ from flask.ext.login import login_user, current_user, logout_user
 from itsdangerous import URLSafeTimedSerializer
 from datetime import timedelta
 from fun_user import save_email, users_number, check_email, check_login
-from fun_user import add_to_emailset,get_message_petdict_from_userid
+from fun_user import add_to_emailset,get_message_petdict_from_userid,\
+                 change_password
 from pet import pets_number, save_data, change_sequence, del_pet 
 from pet import get_petdict_according_petspecies, add_petkey_to_userId
 from pet import get_image_and_petdict, search_results, check_message
 from image import allowed_file, process_filename, save_image_return_url,\
                  get_photourls
-import requests
 from sae.ext.storage import monkey
 from flask.ext.mail import Mail, Message
 
@@ -256,6 +256,47 @@ def usercenter():
     pet_dict = change_sequence(pet_dict)
     return render_template('user_page.html', message=message, 
         pet_dict=pet_dict, username=user_id)
+
+
+@app.route('/reset', methods=['GET','POST'])
+def reset():
+    user_id = current_user.get_id()
+    if request.method == 'POST':
+        email = request.form['email']
+        if check_email(email):
+            msg_title = "找回「带TA回家」的账户密码"
+
+            token = login_serializer.dumps(email, salt='recover-key')
+            recover_url = url_for('reset_with_token', token=token, _external=True)
+
+            msg_body = render_template('email_reset.html', recover_url=recover_url)
+            send_email([str(email)], msg_title, msg_body)
+            message = """已经向你的邮箱 %s发送了一封邮件<br>，请根据其中的指示操作。<br>
+                （提示：邮件可能会被识别为垃圾邮件）""" % email
+        else:
+            message = "此邮箱没有注册，请重新输入或者注册"
+        return render_template('reset.html',message=message, username=user_id)
+
+    return render_template('reset.html', username=user_id)
+
+
+
+@app.route('/reset/<token>',methods=['GET','POST'])
+def reset_with_token(token):
+    user_id = current_user.get_id()
+    try:
+        email = login_serializer.loads(token, salt = "recover-key", max_age = 86400)
+    except:
+        abort(404)
+
+    if request.method == 'POST':
+        password = request.form['password']
+        change_password(email, password)
+        message = "密码修改成功，请重新登录"
+        return render_template('login.html', message = message, username=user_id)
+    return render_template('reset_with_token.html', email=email, token=token, username=user_id)
+
+
 
 
 @app.route('/about_us')
