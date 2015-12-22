@@ -15,6 +15,7 @@ from flask.ext.login import LoginManager, UserMixin, login_required
 from flask.ext.login import login_user, current_user, logout_user
 from itsdangerous import URLSafeTimedSerializer
 from datetime import timedelta
+import hashlib
 from fun_user import save_email, users_number, check_email, check_login
 from fun_user import add_to_emailset,get_message_petdict_from_userid,\
                  change_password
@@ -25,7 +26,7 @@ from image import allowed_file, process_filename, save_image_return_url,\
                  get_photourls
 from sae.ext.storage import monkey
 from flask.ext.mail import Mail, Message
-
+from wechat import wechat_interact 
 monkey.patch_all()
 
 
@@ -305,6 +306,7 @@ def about_us():
     return render_template("us_about.html", username=user_id)
 
 
+
 @app.route('/client', methods=['GET','POST'])
 def client():
     message = request.form['data']
@@ -313,8 +315,7 @@ def client():
     return check_message(message)
 
 
-
-@app.route('/wechat_auth', methods=['GET', 'POST'])
+@app.route('/wechat', methods=['GET', 'POST'])
 def wechat_auth():  
     if request.method == 'GET':  
         token = 'straypets' # your token  
@@ -326,12 +327,14 @@ def wechat_auth():
         s = [timestamp, nonce, token]  
         s.sort()  
         s = ''.join(s)  
-        if ( hashlib.sha1(s).hexdigest() == signature ):    
+        if ( hashlib.sha1(s).hexdigest() == signature ):   
             return make_response(echostr)
+    else:
+        msg_dict = request.stream.read()
+        return wechat_interact(msg_dict)
 
-#@app.route('/wechat', methods['GET', 'POST'])
-#def 
-# Here is used for wechat interaction
+        
+
 
 
 if __name__ == "__main__":

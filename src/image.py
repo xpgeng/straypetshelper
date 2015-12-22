@@ -45,8 +45,8 @@ def get_photourls(user_id, pet_photo):
         if pfile and allowed_file(pfile.filename):
             filename = secure_filename(pfile.filename)
             renew_filename = process_filename(user_id, filename)
-            photo_url = save_image_return_url(renew_filename, pfile)
-            #photo_url = save_image_return_url_sae(renew_filename, pfile)
+            #photo_url = save_image_return_url(renew_filename, pfile)
+            photo_url = save_image_return_url_sae(renew_filename, pfile)
             photo_urls.append(photo_url)
         #else:
         	#return    # havn't finished 
