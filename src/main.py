@@ -267,7 +267,7 @@ def client():
     return check_message(message)
 
 
-@app.route('/wechat_auth', methods=['GET', 'POST'])
+@app.route('/wechat', methods=['GET', 'POST'])
 def wechat_auth():  
     if request.method == 'GET':  
         token = 'straypets' # your token  
@@ -281,86 +281,10 @@ def wechat_auth():
         s = ''.join(s)  
         if ( hashlib.sha1(s).hexdigest() == signature ):    
             return make_response(echostr)
-
-
-@app.route('/wechat', methods['GET', 'POST'])
-def  wechat_interact():
-    msg_dict = parse_message()
-    textTpl = """<xml>
-                 <ToUserName><![CDATA[%s]]></ToUserName>
-                 <FromUserName><![CDATA[%s]]></FromUserName>
-                 <CreateTime>%s</CreateTime>
-                 <MsgType><![CDATA[%s]]></MsgType>
-                 <Content><![CDATA[%s]]></Content>
-                 </xml>"""
-    if msg_dict['MsgType'] == 'event': #return the welcome message
-        return check_event(msg_dict)
-    elif msg_dict['Content'][0] == '.':  # write 
-        tag = check_tag( msg_dict['Content'])[0]
-        string_number = check_tag( msg_dict['Content'])[1]
-        if tag == "NULL":
-            real_content = msg_dict['Content'][1:]
-        else:
-            real_content = msg_dict['Content'][1:(string_number-1)]
-        msg_dict['Content'] = real_content
-        msg_dict['Tag'] = tag
-        item_number = save_message(msg_dict)
-        reply_text = u'''Roger that. 这是第%s条日记.''' % item_number
-        echostr = textTpl % (
-                msg_dict['FromUserName'], msg_dict['ToUserName'], 
-                int(time.time()), msg_dict['MsgType'],reply_text)
-        return echostr
-    elif msg_dict['Content'] == 'h':
-        reply_text = u'''
-        HELP:
-        .+输入内容: write something
-        r: read what you have written
-        h: help
-        d+数字:删除该条笔记
-        c: clear all
-        '''
-        echostr = textTpl % (
-                msg_dict['FromUserName'], msg_dict['ToUserName'],
-                int(time.time()), msg_dict['MsgType'],reply_text)
-        return echostr
-    elif msg_dict['Content'] == 'r':  # read all messsage
-        db_content = read_KVDB()
-        all_content = '\n'.join(value['Content']+'#Tag:'+ 
-                                value['Tag']+'#' for key, value in db_content)
-        print all_content
-        reply_text = u'''%s''' % all_content
-        echostr = textTpl % (
-                msg_dict['FromUserName'], msg_dict['ToUserName'], 
-                int(time.time()), msg_dict['MsgType'],reply_text)
-        return echostr
-    elif msg_dict['Content'][0] == 'd': #delete one item
-        delete_number = msg_dict['Content'][1:]
-        search_key = 'No.'+delete_number
-        return_text = u'''%s已经删除第%s条日记'''%(delete_item(search_key),
-                                    delete_number)
-        echostr = textTpl % (
-                msg_dict['FromUserName'], msg_dict['ToUserName'], 
-                int(time.time()), msg_dict['MsgType'],return_text)
-        return echostr
-    elif msg_dict['Content'] == "c":  # clear all
-        result = delete_all()
-        result_text = u'''%s已经删除全部内容'''% result
-        echostr = textTpl % (
-                msg_dict['FromUserName'], msg_dict['ToUserName'], 
-                int(time.time()), msg_dict['MsgType'],result_text)
-        return echostr
     else:
-        reply_text = u'''
-        .+输入内容: write something
-        r: read what you have written
-        h: help
-        d+数字:删除该条笔记
-        c: clear all
-        '''
-        echostr = textTpl % (
-                msg_dict['FromUserName'], msg_dict['ToUserName'], 
-                int(time.time()), msg_dict['MsgType'],reply_text)
-        return echostr
+        msg_dict = request.stream.read()
+
+        
 
 
 

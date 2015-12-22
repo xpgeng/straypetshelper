@@ -26,7 +26,7 @@ def main():
                  <MsgType><![CDATA[text]]></MsgType>
                  <Content><![CDATA[%s]]></Content>
                  <MsgId>1234567890123456</MsgId>
-                 </xml>"""  
+                 </xml>"""
         send_content = raw_input('> ')
         echostr = textTpl % ('qqqq', 'wwww', int(time.time()), send_content)
         r = requests.post('http://localhost:8080/wechat', echostr)
