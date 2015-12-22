@@ -112,7 +112,7 @@ def _save_data(pet_title,species,location,tel,supplement, photo_url, user_id):
     kv.disconnect_all()
     return key
 
-def del_pet(pet_id):
+def del_pet(pet_id, user_id):
     from qiniu import BucketManager
     from qiniu import Auth, put_data
 
@@ -123,26 +123,26 @@ def del_pet(pet_id):
     bucket = BucketManager(q)
 
     kv = sae.kvdb.Client()
-    image_urls = kv.get(pet_id)['photo_urls']
+    image_urls = kv.get(str(pet_id))['photo_urls']
     for image_url in image_urls:
         key = image_url.split('/')[-1]
-        ret, info = bucket.delete(bucket_name, key)
-        
+        ret, info = bucket.delete(bucket_name, key)        
     kv.delete(pet_id)
     number = kv.get('petsnumber') - 1
     kv.replace('petsnumber', number)
+
+    user_dic = kv.get(str(user_id))
+    user_dic['pet'].remove(str(pet_id))
+    kv.set(str(user_id),user_dic)
+
     kv.disconnect_all()
 
 def add_petkey_to_userId( user_id, petkey):
     kv = sae.kvdb.Client()
-    if kv.get(str(user_id)):
-        user_dic = kv.get(str(user_id))
-        user_dic['pet'].append(str(petkey))
-        kv.set(str(user_id),user_dic)
-    else:
-        user_dic = {}
-        user_dic['pet'] = [str(petkey)]
-        kv.set(str(user_id),user_dic)
+    kv.get(str(user_id)):
+    user_dic = kv.get(str(user_id))
+    user_dic['pet'].append(str(petkey))
+    kv.set(str(user_id),user_dic)
     kv.disconnect_all()
 
 def get_petdict_according_petspecies(pet_species):
@@ -191,35 +191,46 @@ def search_results(query):
 
 def check_message(message):
     kv = sae.kvdb.Client()
-    if message[0:1] == 'd.':
-        key = message[2:]
-        content = kv.get(key)
-        kv.delete(key)
-        return  "%s\n This item has beem deleted." %content
-    elif message[0:2] == 'dp.':
-        prefix = message[3:]
-        keys = kv.getkeys_by_prefix(prefix)
-        for key in keys:
-            kv.delete(key)
-        return "%s\n All the keys' item have been deleted." %keys
-    elif message == 'backup':
+    if message == 'backup':
         bucket = Bucket('backup')
         bucket.put()
         data_dict = dict(kv.get_by_prefix(''))
         data_dict = json.dumps(data_dict)
         bucket.put_object('database.json', data_dict)
         return "备份成功!"
-    elif message[0:4] == 'get.':
-        prefix = message[5:]
-        content = dict(kv.get_by_prefix(prefix))
-        return '''They are:
-               %s
-               '''% content
     elif message == 'ca':
         keys = kv.getkeys_by_prefix('')
         for key in keys:
             kv.delete(key)
         return "Database is empty!"
+    elif '.' in message:
+        funs, values = message.split('.',1)
+        if funs == 'd':
+            key = values
+            content = kv.get(key)
+            kv.delete(key)
+            return  "%s\n This item has beem deleted." %content
+        elif funs == 'dp':
+            prefix = values
+            keys = kv.getkeys_by_prefix(prefix)
+            for key in keys:
+                kv.delete(key)
+            return "%s\n All the keys' item have been deleted." %keys
+        elif funs == 'get':
+            prefix = values
+            content = dict(kv.get_by_prefix(prefix))
+            return '''They are:
+               %s
+               '''% content
+        elif funs == 'du':
+            user_email = str(values)
+            kv.delete(user_email)
+            emails = kv.get('emailset')
+            emails = [x for x in emails if not x == user_email]
+            kv.set ('emailset',emails)
+            number = kv.get('usersnumber') - 1
+            kv.replace('usersnumber', number)
+            return """用户%s已经删除"""%user_email
     else:
         return "Sorry, Please check your input..."
     kv.disconnect_all()
@@ -228,39 +239,3 @@ def check_message(message):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    

@@ -7,10 +7,8 @@
 </div>
 </header>
 
-{% if not pet_dict %}
-<a href={{url_for('submit_pet')}}>点我发布动物信息</a>
+{% if  pet_dict %}
 
-{% else %}
 <div class="container con1">
 <div class="photowall js-masonry"
   data-masonry-options='{ "itemSelector": ".pet" }'>
@@ -19,10 +17,10 @@
    
   <!-- <div class="col-sm-3 col-md-3"> -->
   
-  <a href="/petpage/{{key}}" title="点击查看TA的详细信息"> 
+  <a href="{{url_for('show_post', pet_id = key)}}" title="点击查看TA的详细信息"> 
     <div class="pet thumbnail">
       
-      <img src="{{value['photo_urls'][0]}}" alt="your image", width="300">
+      <img src="{{value['photo_urls'][0] + '?imageView2/2/w/300' }}" alt="your image">
       
       <div class="caption">
 

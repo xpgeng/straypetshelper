@@ -18,17 +18,26 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 def main():
-    print'''Hello. 
+    help_message = '''Hello. 
+
          你要干啥???
          d.key: 删除该key对应的数据
          dp.key_prefix: 删除此前缀的所有数据  
          backup: 数据库备份
          get.prefix: 查看该前缀的所有数据
          ca: 清空数据库. 慎用!!
+         du.email: 删除该email对应的用户
+         help or h or H: 帮助
          '''
+    print help_message
     while True:  
         data = raw_input('> ')
-        r = requests.post('http://localhost:8080/client', data={'data':data})   
-        print r.content
+        if data in ['help','h','H']:
+            print help_message
+        else:
+            r = requests.post('http://taketahome.sinaapp.com/client', data={'data':data})   
+            print r.content
+            print help_message
+
 if __name__ == '__main__':
     main()

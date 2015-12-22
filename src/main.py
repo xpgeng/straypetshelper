@@ -103,6 +103,15 @@ def load_token(token):
         return user
     return None
 
+def send_email(recp_list, msg_title, msg_body):
+    msg = Message(
+              str(msg_title),
+           sender='straypetshelper@sina.com',
+           recipients=recp_list)
+    msg.body = msg_body
+    mail.send(msg)
+    return "Sent"
+
 
 @app.route('/')
 def show_all():
@@ -142,15 +151,16 @@ def checkin_pet():
 
 @app.route('/search_result', methods=['GET', 'POST'])
 def search_result():
+    user_id = current_user.get_id()
     query = request.form['query']
     query = str(query)
     if not query:
         return render_template("nullpage.html")
     pet_dict = search_results(query)
     if pet_dict:
-        return render_template('show_dict.html', pet_dict=pet_dict)
+        return render_template('show_dict.html', pet_dict=pet_dict, username=user_id)
     else:
-        return render_template("nullpage.html")
+        return render_template("nullpage.html", username=user_id)
 
 
 @app.route('/signup', methods=['GET','POST'])
@@ -175,6 +185,9 @@ def sign_up():
             message = '注册成功!'
             user = User.get(str(email))
             login_user(user, remember=True)
+            msg_title = "欢迎注册 带TA回家"
+            msg_body = "亲爱的%s, 您好\n\n\t 欢迎您注册带TA回家。\n\t如果有任何的建议，请直接回复邮件。\n\n\t谢谢！"%username
+            send_email([str(email)], msg_title, msg_body)
             return redirect(url_for('show', pet_species = 'all')) 
         else:
             message = '确认密码和密码不一致，重新输入吧:-）'   
@@ -227,9 +240,11 @@ def show_post(pet_id):
 
 @app.route('/delete_pet', methods=['GET', 'POST'])
 def delete_pet():
+    user_id = current_user.get_id()
     pet_id = request.form['pet_id']
     pet_id = str(pet_id)
-    del_pet(pet_id)
+    user_id = str(user_id)
+    del_pet(pet_id, user_id)
     return redirect(url_for('usercenter'))
 
 
@@ -248,15 +263,6 @@ def about_us():
     user_id = current_user.get_id()
     return render_template("us_about.html", username=user_id)
 
-@app.route('/find_pw')
-def find_pw():
-    msg = Message(
-              'Hello',
-           sender='straypetshelper@sina.com',
-           recipients=['huijuannan.p@gmail.com'])
-    msg.body = "This is the email body"
-    mail.send(msg)
-    return "Sent"
 
 
 @app.route('/client', methods=['GET','POST'])
