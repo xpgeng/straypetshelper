@@ -38,6 +38,15 @@ def save_email(email, password, username):
     kv.set(str(email), message)
     kv.disconnect_all()
 
+def change_password(email, password):
+    kv = sae.kvdb.Client()
+    user = kv.get(str(email))
+    pwhash = generate_password_hash(password) #hash加密
+    user['password'] = pwhash
+    kv.set(str(email), user)
+    kv.disconnect_all()
+
+
 def add_to_emailset(email):
     kv = sae.kvdb.Client()
     if kv.get('emailset'):
