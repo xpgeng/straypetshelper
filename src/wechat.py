@@ -44,27 +44,24 @@ textTpl_image = """<xml>
         """
 
 
+
 def check_event(msg_dict):
     '''if somebody subscribe this account, then return this message'''
     if msg_dict['Event'] == "subscribe" :   
         reply_text = u'''带Ta回家吧
                          输入r: 查看最新发布的宠物信息
                          '''
-        echostr = textTpl % (
-            msg_dict['FromUserName'], msg_dict['ToUserName'], int(time.time()),  
+        echostr = textTpl % (FromUser, ToUser, int(time.time()),  
                     'text',reply_text)
         return echostr
     elif msg_dict['Event'] == "unsubscribe":
         reply_text = u'''感谢您的支持.'''
         echostr = textTpl % (
-                msg_dict['FromUserName'], msg_dict['ToUserName'], int(time.time()),  
+                FromUser, ToUser, int(time.time()),  
                     'text',reply_text)
         return echostr
     else:
         return None
-
-
-
 
 
 
@@ -74,21 +71,22 @@ def wechat_interact(msg_dict):
     MsgType = msg_dict.find('MsgType').text
     ToUser = msg_dict.find('ToUserName').text
     FromUser = msg_dict.find('FromUserName').text
-    
-    if msg_dict['MsgType'] == 'event': #return the welcome message
+    content = msg_dict.find('Content').text
+    print MsgType, ToUser, FromUser 
+    if MsgType == 'event': #return the welcome message
         return check_event(msg_dict)
-    elif msg_dict['Content'] == 'r':  
+    elif content == 'r': 
+        print 1111
         kv = sae.kvdb.Client()
-        pets_dict = kv.get_by_perfix('s', limit=2)
+        pets_dict = kv.get_by_prefix('s', limit=2)
         if not pets_dict:
             reply_text = u'''Sorry, 数据库出现了一点小状况, 攻城狮正在修复ing...'''
-            echostr = textTpl % (
-                msg_dict['FromUserName'], msg_dict['ToUserName'], int(time.time()),  
-                    'text',reply_text)
-            return echostr
         else:
-        	pet_discription = []
-
+            now = int(time.time())
+            text_list = []
+            text_list.append(FromUser)
+            text_list.append(ToUser)
+            text_list.append(now)
             for key, value in pets_dict:
                 discription= """
                 日期:%s
@@ -104,81 +102,23 @@ def wechat_interact(msg_dict):
                 	value['sterilization'], value['immunization'], \
                 	value['health'], value['tel'],value['location'],\
                 	value['supplement'])
-                pets_discription.append(value['pet_title'])
-                pets_discription.append(discription)
-                pets_discription.append(value['photo_urls'][0])
+                text_list.append(value['pet_title'])
+                text_list.append(discription)
+                text_list.append(value['photo_urls'][0])
                 url = "http://taketahome.sinaapp.com/petpage/%s"% key
-                pets_discription.append(url)
+                text_list.append(url)
+                print text_list
+            return textTpl_image % tuple(text_list)
+    elif content in ['h', 'H', 'help', 'Help']:
+        reply_text = u'''r : 查看最近发布的宠物信息'''
+    else:
+        reply_text = u'''对不起, 目前功能尚不完善.'''
+    
+    echostr = textTpl % (
+                FromUser, ToUser, int(time.time()),  
+                    'text',reply_text)
+    return echostr
+
 
             
 
-
-
-
-
-
-
-
-        if tag == "NULL":
-            real_content = msg_dict['Content'][1:]
-        else:
-            real_content = msg_dict['Content'][1:(string_number-1)]
-        msg_dict['Content'] = real_content
-        msg_dict['Tag'] = tag
-        item_number = save_message(msg_dict)
-        reply_text = u'''Roger that. 这是第%s条日记.''' % item_number
-        echostr = textTpl % (
-                msg_dict['FromUserName'], msg_dict['ToUserName'], 
-                int(time.time()), msg_dict['MsgType'],reply_text)
-        return echostr
-    elif msg_dict['Content'] == 'h':
-        reply_text = u'''
-        HELP:
-        .+输入内容: write something
-        r: read what you have written
-        h: help
-        d+数字:删除该条笔记
-        c: clear all
-        '''
-        echostr = textTpl % (
-                msg_dict['FromUserName'], msg_dict['ToUserName'],
-                int(time.time()), msg_dict['MsgType'],reply_text)
-        return echostr
-    elif msg_dict['Content'] == 'r':  # read all messsage
-        db_content = read_KVDB()
-        all_content = '\n'.join(value['Content']+'#Tag:'+ 
-                                value['Tag']+'#' for key, value in db_content)
-        print all_content
-        reply_text = u'''%s''' % all_content
-        echostr = textTpl % (
-                msg_dict['FromUserName'], msg_dict['ToUserName'], 
-                int(time.time()), msg_dict['MsgType'],reply_text)
-        return echostr
-    elif msg_dict['Content'][0] == 'd': #delete one item
-        delete_number = msg_dict['Content'][1:]
-        search_key = 'No.'+delete_number
-        return_text = u'''%s已经删除第%s条日记'''%(delete_item(search_key),
-                                    delete_number)
-        echostr = textTpl % (
-                msg_dict['FromUserName'], msg_dict['ToUserName'], 
-                int(time.time()), msg_dict['MsgType'],return_text)
-        return echostr
-    elif msg_dict['Content'] == "c":  # clear all
-        result = delete_all()
-        result_text = u'''%s已经删除全部内容'''% result
-        echostr = textTpl % (
-                msg_dict['FromUserName'], msg_dict['ToUserName'], 
-                int(time.time()), msg_dict['MsgType'],result_text)
-        return echostr
-    else:
-        reply_text = u'''
-        .+输入内容: write something
-        r: read what you have written
-        h: help
-        d+数字:删除该条笔记
-        c: clear all
-        '''
-        echostr = textTpl % (
-                msg_dict['FromUserName'], msg_dict['ToUserName'], 
-                int(time.time()), msg_dict['MsgType'],reply_text)
-        return echostr

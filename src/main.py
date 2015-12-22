@@ -25,7 +25,7 @@ from image import allowed_file, process_filename, save_image_return_url,\
                  get_photourls
 from sae.ext.storage import monkey
 from flask.ext.mail import Mail, Message
-import xml.etree.ElementTree as ET
+from wechat import wechat_interact 
 monkey.patch_all()
 
 
@@ -279,10 +279,11 @@ def wechat_auth():
         s = [timestamp, nonce, token]  
         s.sort()  
         s = ''.join(s)  
-        if ( hashlib.sha1(s).hexdigest() == signature ):    
+        if ( hashlib.sha1(s).hexdigest() == signature ):   
             return make_response(echostr)
     else:
         msg_dict = request.stream.read()
+        return wechat_interact(msg_dict)
 
         
 

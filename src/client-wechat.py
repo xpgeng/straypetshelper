@@ -13,11 +13,9 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 def main():
-    print'''.+输入内容: write something
-            r: read what you have written
-            h: help
-            d+数字:删除该条笔记
-            c: clear all'''
+    print'''带Ta回家吧
+    输入r: 查看最新发布的宠物信息
+    '''
     while True:
         textTpl = """<xml>
                  <ToUserName><![CDATA[%s]]></ToUserName>
@@ -35,8 +33,5 @@ def main():
         for child in root:
             msg_dict[child.tag] = child.text
         print msg_dict['Content']
-        print msg_dict['CreateTime']
-        print int(time.time())
-
 if __name__ == '__main__':
     main()
