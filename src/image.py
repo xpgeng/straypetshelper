@@ -28,7 +28,6 @@ def save_image_return_url(filename, file):
     key = filename
     token = q.upload_token(bucket_name, key)
     ret, info = put_data(token,key,file.read())
-
     return "http://7xpby0.com1.z0.glb.clouddn.com/"+filename
 
 def save_image_return_url_sae(filename, file):
@@ -46,7 +45,7 @@ def get_photourls(user_id, pet_photo):
             filename = secure_filename(pfile.filename)
             renew_filename = process_filename(user_id, filename)
             photo_url = save_image_return_url(renew_filename, pfile)
-            #photo_url = save_image_return_url_sae(renew_filename, pfile)
+            # photo_url = save_image_return_url_sae(renew_filename, pfile)
             photo_urls.append(photo_url)
         #else:
         	#return    # havn't finished 
