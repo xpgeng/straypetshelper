@@ -8,19 +8,6 @@
 	<title>带TA回家</title>
 	<link rel="stylesheet" href="http://apps.bdimg.com/libs/bootstrap/3.3.0/css/bootstrap.min.css">
 	
-	<script type="text/javascript">
-	function readURL(input){
-		if (input.files && input.files[0]){
-			var reader = new FileReader();
-
-			reader.onload = function(e){
-				$('#blah').attr('src', e.target.result).width(150);
-			};
-			reader.readAsDataURL(input.files[0]);
-			document.getElementById("photo_help").innerHTML = "";
-		}
-	}</script>
-
 	<style >
       
         .starter{
@@ -29,16 +16,8 @@
         }
 	</style>
 
-    <script>
-    var $container = $('#photowall');
-    $container.imagesLoaded(function(){
-    $container.masonry(
-        {
-        itemSelector:'.pet'
-        })
-    }
-    )
-    </script>
+   
+    
   
     <style>
     html {
@@ -49,7 +28,7 @@
 body{
           background-color: #FFFFFF;
           color: #222222;
-          margin-bottom: 40px;
+          /*margin-bottom: 40px;*/
         }
 
 .footer {
@@ -59,6 +38,8 @@ body{
   /* Set the fixed height of the footer here */
   height: 40px;
   background-color: #222222;
+  margin-top: 10px;
+  clear: both;
   
 }
 
@@ -72,29 +53,57 @@ margin-left: 20px;
 margin-top: 10px;
 }
 
+
         .jumbotron{
           margin: 0px;
           padding:0px;
         }
 
         .pet{
-          padding: 2px;
-          border: 3px ridge #222222;
-          margin: 8px;
-          width: 23%;
+          padding: 0;
+          border: 1px;
+          margin: 8px; 
+          width: 250px;
+          float: left;
+          /*display: inline-block;         */
         }
+
+
+        .pet img{
+          display: block;
+          width: 250px;
+          border-top-left-radius:4px;
+          border-top-right-radius: 4px;
+        }
+
+       
+
         .con1{
-          margin: 10px;
+          margin: 0px;
           padding: 0px;
+          width: 100%;
+          background-color: #E9E9E9;
         }
+
         .photowall{
-          margin: 10px;
+          margin: 0 auto;
           padding: 0px;
+          
+
         }
         
+        .navbar{
+          margin-bottom: 0px;
+        }
+
 
         a:hover{
             text-decoration: none;
+        }
+
+        .mainSection{
+          margin: 0 0 40px 0;
+          padding: 0;
         }
 
         #forget_pw{
@@ -104,37 +113,6 @@ margin-top: 10px;
         }
      
 
-        
-     
-        @media only screen and (max-width : 999px),
-        only screen and (max-device-width : 99px){
-            .pet {
-            width: 31%;
-            }
-        }
-
-
-
-        @media only screen and (max-width : 799px),
-        only screen and (max-device-width : 799px){
-            .pet {
-            width: 350px;
-            }
-        }
-
-        @media only screen and (max-width : 599px),
-        only screen and (max-device-width : 599px){
-            .pet {
-            width: 250px;
-            }
-        }
-
-        @media only screen and (max-width : 399px),
-        only screen and (max-device-width : 399px){
-            .pet {
-            width: 170px;
-            }
-        }
 
         #message {
             color: #222222
@@ -191,11 +169,13 @@ margin-top: 10px;
           </div><!-- navbar-->
       </div> <!-- container -->
       </nav> 
+      <div class="mainSection">
 
 
 {% block body %}{% endblock %}
   
       
+      </div>
 <!-- Footer -->
   <footer class="footer">
     <div class="container">
@@ -208,9 +188,25 @@ margin-top: 10px;
   <script src="http://apps.bdimg.com/libs/bootstrap/3.3.0/js/bootstrap.min.js"></script>
   <script src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script> 
     <script src="http://tjs.sjs.sinajs.cn/open/api/js/wb.js" type="text/javascript" charset="utf-8"></script>
+    <!--
     <script src="https://cdnjs.cloudflare.com/ajax/libs/masonry/3.3.2/masonry.pkgd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/3.2.0/imagesloaded.pkgd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/3.2.0/imagesloaded.pkgd.min.js"></script> -->
+
+    <script src="{{url_for('static', filename='masonry.pkgd.min.js')}}" type="text/javascript"></script>
+    <script src="{{url_for('static', filename='imagesloaded.pkgd.min.js')}}" type="text/javascript"></script>
     <script src="{{url_for('static', filename='jquery.MultiFile.js')}}" type="text/javascript" language="javascript"></script>
     <script src="{{url_for('static', filename='gen_validatorv4.js')}}" type="text/javascript"></script>
+
+     <script>
+    $(document).ready(function(){
+       var $container = $('.photowall').imagesLoaded(function(){
+      $container.masonry({
+      itemSelector: '.pet',
+      isFitWidth: true
+    });
+    });
+     });
+   
+    </script>
 </body>
 </html>
