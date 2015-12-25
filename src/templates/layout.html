@@ -158,7 +158,7 @@ margin-top: 10px;
                 </li>
 
           
-                <li><a href={{url_for('submit_pet')}}>发布</a></li>
+                
                 <li><a href={{url_for('about_us')}}>关于我们</a></li>
             </ul>
 
@@ -176,8 +176,16 @@ margin-top: 10px;
             <li><a href={{url_for('login')}}>登录</a></li>
             <li><a href={{url_for('sign_up')}}>注册</a></li>
             {% else %}
-            <li><a href={{ url_for('usercenter') }}>{{username}}</a></li>
-            <li><a href={{ url_for('logout') }}>退出登录</a></li>
+            <li class="dropdown">
+                <a href={{ url_for('usercenter') }} class="dropdown-toggle" data-toggle="dropdown" >{{username}}<strong class="caret"></strong></a>
+                <ul class="dropdown-menu">
+                    <li><a href={{url_for('usercenter')}}><span class="glyphicon glyphicon-user"></span> 用户中心</a></li>
+                    <li><a href={{url_for('submit_pet')}}><span class="glyphicon glyphicon-plus"></span> 发布信息</a></li>
+                    <li class="divider"></li>
+                    <li><a href={{ url_for('logout') }}><span class="glyphicon glyphicon-off"></span> 退出登录</a></li>    
+                </ul>
+            </li>
+            
             {% endif %}          
             </ul><!-- navbar-right -->
 
