@@ -8,6 +8,9 @@
 	<title>带TA回家</title>
 	<link rel="stylesheet" href="http://apps.bdimg.com/libs/bootstrap/3.3.0/css/bootstrap.min.css">
 	
+  <!-- Custom CSS -->
+  <link href="static/css/styles.css" rel="stylesheet">
+
 	<style >
       
         .starter{
@@ -36,16 +39,21 @@ body{
   bottom: 0;
   width: 100%;
   /* Set the fixed height of the footer here */
-  height: 40px;
-  background-color: #222222;
+  height: 60px;
+  background-color: #333;
   margin-top: 10px;
   clear: both;
   
 }
 
 footer p{
-    color: #FFFFFF;
+    color: #eee;
     margin: 10px 0;
+}
+
+ul.unstyled{
+  list-style: none;
+  padding: 0;
 }
 
 header h2 {
@@ -296,14 +304,35 @@ margin-top: 10px;
 
 {% block body %}{% endblock %}
   
-      
+    
+
       </div>
 <!-- Footer -->
   <footer class="footer">
     <div class="container">
-      <p class="text-center">© 2015 - StrayPetsHelper</p>
+        <div class="row">
+            <div class="col-sm-4">
+                <h6>Copyright &copy; 2015 - StrayPetsHelper</h6>
+            </div>
+            <div class="col-sm-4">
+                <h6>Contact us</h6>
+                <ul class="unstyled">
+                    <li href="">E-mail:XXXXXX@XXXX.com</li>
+                </ul>             
+            </div>
+            <div class="col-sm-4">
+                <h6>Follow us</h6>
+                <ul class="unstyled">
+                    <li href="">微博</li>
+                </ul>
+            </div>
+            
+        </div>
+      
     </div>
-  </footer>
+
+    </footer>
+
 
   <!-- scripts -->
   <script src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script>
