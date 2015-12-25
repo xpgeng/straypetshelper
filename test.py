@@ -9,15 +9,33 @@
 
 #    def is_active(self):
 #        return self.active
-users = list('abc')
-email = raw_input('> ')
-print email 
-def f(email):
-    if email not in users:
-    	print 11111
-        return
+#users = list('abc')
+#email = raw_input('> ')
+#print email 
+#def f(email):
+#    if email not in users:
+#    	print 11111
+#        return
  
-    user = email
-    return user
+#    user = email
+#    return user
 
-print f(email)
+#print f(email)
+
+
+a = 'sdf'
+b = 'werwe'
+c = ['a','b','c']
+
+
+
+string = '%s, %s, %s'
+print string % tuple(c) 
+
+
+
+
+
+
+
+
