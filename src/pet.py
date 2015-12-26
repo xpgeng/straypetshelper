@@ -205,7 +205,7 @@ def check_message(message):
     elif '.' in message:
         funs, values = message.split('.',1)
         if funs == 'd':
-            key = values
+            key = str(values)
             content = kv.get(key)
             kv.delete(key)
             return  "%s\n This item has beem deleted." %content
@@ -216,7 +216,7 @@ def check_message(message):
                 kv.delete(key)
             return "%s\n All the keys' item have been deleted." %keys
         elif funs == 'get':
-            prefix = values
+            prefix = str(values)
             content = dict(kv.get_by_prefix(prefix))
             return '''They are:
                %s
