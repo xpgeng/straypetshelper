@@ -169,10 +169,10 @@ def get_image_and_petdict(pet_id):
 
 def search_results(query):
     kv = sae.kvdb.Client()
-    data = kv.get_by_prefix('s')
+    data = kv.get_by_prefix('s:')
     results = []
     for key, value in data:
-        pet_item = [value['pet_title'], value['species'], value['location'],\
+        pet_item = [value['pet_title'],value['species'], value['location'],\
             value['supplement'], value['date'], value['email']]
         for item in pet_item:
             if query in str(item):
@@ -205,7 +205,7 @@ def check_message(message):
     elif '.' in message:
         funs, values = message.split('.',1)
         if funs == 'd':
-            key = values
+            key = str(values)
             content = kv.get(key)
             kv.delete(key)
             return  "%s\n This item has beem deleted." %content
@@ -216,7 +216,7 @@ def check_message(message):
                 kv.delete(key)
             return "%s\n All the keys' item have been deleted." %keys
         elif funs == 'get':
-            prefix = values
+            prefix = str(values)
             content = dict(kv.get_by_prefix(prefix))
             return '''They are:
                %s
