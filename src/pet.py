@@ -169,10 +169,10 @@ def get_image_and_petdict(pet_id):
 
 def search_results(query):
     kv = sae.kvdb.Client()
-    data = kv.get_by_prefix('s')
+    data = kv.get_by_prefix('s:')
     results = []
     for key, value in data:
-        pet_item = [value['pet_title'], value['species'], value['location'],\
+        pet_item = [value['pet_title'],value['species'], value['location'],\
             value['supplement'], value['date'], value['email']]
         for item in pet_item:
             if query in str(item):

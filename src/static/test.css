@@ -1,0 +1,34 @@
+
+#gallery-header-center-right{
+	height: 35px;
+	margin: 20px auto;
+	line-height: 35px;
+
+}
+
+.gallery-header-center-right-links {
+	color: #333333;
+	height: 35px;
+	padding-right: 20px;
+	padding-left: 20px;
+	margin-left: 20px;
+	font-size: 16px;
+	font-weight: 400;
+	-webkit-transition: background 0.5s;
+	-moz-transition: background 0.5s;
+	-o-transition: background 0.5s;
+	transition: background 0.5s;
+	display: inline-block;
+}
+.gallery-header-center-right-links:hover {
+	background-color: #2aabf1;
+	color: rgba(255,255,255,1);
+	cursor: pointer;
+}
+.gallery-header-center-right-links-current {
+	color: #FFFFFF;
+	background-color: #2aabf1;
+}
+.gallery-header-center-right-links-current:hover {
+	background-color: rgba(63,141,191,0.5);
+}

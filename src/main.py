@@ -230,6 +230,14 @@ def show(pet_species):
     pet_dict = change_sequence(pet_dict)
     return render_template('show_dict.html', pet_dict=pet_dict, username=user_id)
        
+############ test show page
+@app.route('/test', methods=['GET', 'POST'])
+def test():
+    user_id = current_user.get_id()
+    pet_dict = get_petdict_according_petspecies('all')
+    pet_dict = change_sequence(pet_dict)
+    return render_template('testShow.html', pet_dict=pet_dict, username=user_id)
+
 
 @app.route('/petpage/<pet_id>')
 def show_post(pet_id):
