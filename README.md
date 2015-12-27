@@ -4,6 +4,8 @@
 
 [点这里](https://github.com/xpgeng/straypetshelper/issues/22)吐嘈、给建议
 
+[看路演](http://v.youku.com/v_show/id_XMTQyNjM4NzY5Ng==.html)
+
 ##Motivation
 很多人捡到流浪宠物但是由于种种原因自己无法收养, 但又苦于信息不通畅, 没法让更多的有收养能力的人了解到这方面信息. 所以建立这样一个流浪宠物信息平台, 使得流浪宠物的信息能够及时发布, 想收养流浪宠物的人们及时领养自己心怡的宠物.
 
