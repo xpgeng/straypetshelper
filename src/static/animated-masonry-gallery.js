@@ -24,13 +24,16 @@ function check_button(){
 	if(button==3){
 		$("#filter-dog").addClass(button_class);
 		}	
+	if(button==4){
+		$("#filter-single").addClass(button_class);
+		}
 }
 	
 	
 $("#filter-all").click(function() { $containerTest.isotope({ filter: '.pet' }); button = 1; check_button(); });
 $("#filter-cat").click(function() {  $containerTest.isotope({ filter: '.Spe-c' }); button = 2; check_button();  });
 $("#filter-dog").click(function() {  $containerTest.isotope({ filter: '.Spe-d' }); button = 3; check_button();  });
-
+$("#filter-single").click(function() {  $containerTest.isotope({ filter: '.Spe-s' }); button = 3; check_button();  });
 
 check_button();
 });
