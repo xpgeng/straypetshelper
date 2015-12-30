@@ -68,6 +68,8 @@ def save_data(pet_title, age, gender, sterilization, immunization, \
         key = str('s:d'+strftime("%y%m%d%H%M%S" , localtime()))
     elif species == '猫猫':
         key = str('s:c'+strftime("%y%m%d%H%M%S" , localtime()))
+    elif species =='单身汪':
+        key = str('s:s'+strftime("%y%m%d%H%M%S" , localtime())) # singledog
     else:
         key = str('s:e'+strftime("%y%m%d%H%M%S" , localtime()))
     print key
@@ -150,6 +152,8 @@ def get_petdict_according_petspecies(pet_species):
         prefix = 's:d'
     elif pet_species == 'cat':
         prefix = 's:c'
+    elif pet_species == 'singledog':
+        prefix = 's:s'
     elif pet_species == 'all':
         prefix = 's:'
     else:

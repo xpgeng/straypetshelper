@@ -33,7 +33,7 @@ function check_button(){
 $("#filter-all").click(function() { $containerTest.isotope({ filter: '.pet' }); button = 1; check_button(); });
 $("#filter-cat").click(function() {  $containerTest.isotope({ filter: '.Spe-c' }); button = 2; check_button();  });
 $("#filter-dog").click(function() {  $containerTest.isotope({ filter: '.Spe-d' }); button = 3; check_button();  });
-$("#filter-single").click(function() {  $containerTest.isotope({ filter: '.Spe-s' }); button = 3; check_button();  });
+$("#filter-single").click(function() {  $containerTest.isotope({ filter: '.Spe-s' }); button = 4; check_button();  });
 
 check_button();
 });
