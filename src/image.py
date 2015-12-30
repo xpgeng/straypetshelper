@@ -31,6 +31,8 @@ def save_image_return_url(filename, file):
     return "http://7xpby0.com1.z0.glb.clouddn.com/"+filename
 
 def save_image_return_url_sae(filename, file):
+    """仅供本地调试使用
+    """
     from sae.storage import Connection, Bucket
     c = Connection()
     bucket = c.get_bucket('images')
