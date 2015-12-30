@@ -68,7 +68,7 @@ def save_data(pet_title, age, gender, sterilization, immunization, \
         key = str('s:d'+strftime("%y%m%d%H%M%S" , localtime()))
     elif species == '猫猫':
         key = str('s:c'+strftime("%y%m%d%H%M%S" , localtime()))
-    elif species =='单身狗':
+    elif species =='单身汪':
         key = str('s:s'+strftime("%y%m%d%H%M%S" , localtime())) # singledog
     else:
         key = str('s:e'+strftime("%y%m%d%H%M%S" , localtime()))
