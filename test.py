@@ -23,17 +23,14 @@
 #print f(email)
 
 
-a = 'sdf'
-b = 'werwe'
-c = ['a','b','c']
+#a = 'sdf'
+#b = 'werwe'
+#c = ['a','b','c']
 
 
 
-string = '%s, %s, %s'
-print string % tuple(c) 
-
-
-
+#string = '%s, %s, %s'
+#print string % tuple(c) 
 
 
 
